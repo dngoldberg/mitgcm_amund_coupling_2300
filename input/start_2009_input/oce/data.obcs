@@ -1,0 +1,38 @@
+# Open-boundaries
+ &OBCS_PARM01
+ ob_jsouth = 79*1 161*0,,
+ OB_Iwest=295*1 121*0,
+ useOBCSprescribe=.TRUE.,
+ useOBCSsponge=.FALSE.,
+ obsufile = 'uvel_2006.obs.0',
+ obsvfile = 'vvel_2006.obs.0',
+ obstfile = 'temp_2006.obs.0',
+ obssfile = 'salt_2006.obs.0',
+# OBNuFile='uvel_1996_0.obn',
+# OBNvFile='vvel_1996_0.obn',
+# OBNtFile='temp_1996_0.obn',
+# OBNsFile='salt_1996_0.obn', 
+ obwufile = 'uvel_2006.obw.0',
+ obwvfile = 'vvel_2006.obw.0',
+ obwtfile = 'temp_2006.obw.0',
+ obwsfile = 'salt_2006.obw.0',
+ useOBCSBalance=.TRUE.,
+ OBCS_balanceFacW=1.0,
+ OBCS_balanceFacS=1.0,
+# OBCS_balanceFacN=1.0,
+ &
+
+# Orlanski parameters
+ &OBCS_PARM02
+#Cmax=0.45,
+#cVelTimeScale=1000.,
+ &
+
+# Sponge layer parameters
+ &OBCS_PARM03
+ spongeThickness = 10,
+ Urelaxobcsinner = 21600,
+ Vrelaxobcsinner = 21600,
+ Urelaxobcsbound = 10800,
+ Vrelaxobcsbound = 10800,
+ &

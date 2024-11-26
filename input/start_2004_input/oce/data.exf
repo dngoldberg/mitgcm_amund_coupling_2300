@@ -1,0 +1,131 @@
+# *********************
+ &EXF_NML_01
+#
+ useExfCheckRange  = .FALSE.,
+# repeatPeriod      = 31622400.0,
+ exf_iprec         = 64,
+#
+ &
+
+# *********************
+ &EXF_NML_02
+#
+# startdate1 = 19920101,
+# hfluxstartdate2   = 180000,
+# hfluxperiod       = 2628000.0,
+#
+# startdate1 = 19920101,
+# sfluxstartdate2   = 180000,
+# sfluxperiod       = 2628000.0,
+#
+# startdate1 = 19920101,
+# ustressstartdate2 = 180000,
+# ustressperiod     = 2628000.0,
+#
+# startdate1 = 19920101,
+# vstressstartdate2 = 180000,
+# vstressperiod     = 2628000.0,
+#
+# startdate1 = 19920101,
+# atempstartdate2   = 180000,
+# atempperiod       = 2628000.0,
+#
+# startdate1 = 19920101,
+# aqhstartdate2     = 180000,
+# aqhperiod         = 2628000.0,
+#
+# startdate1 = 19920101,
+#evapstartdate2    = 180000,
+#evapperiod        = 2628000.0,
+#
+# startdate1 = 19920101,
+# precipstartdate2  = 180000,
+# precipperiod      = 2628000.0,
+#
+# startdate1 = 19920101,
+# uwindstartdate2   = 180000,
+# uwindperiod       = 2628000.0,
+#
+# startdate1 = 19920101,
+# vwindstartdate2   = 180000,
+# vwindperiod       = 2628000.0,
+#
+# startdate1 = 19920101,
+# swfluxstartdate2  = 180000,
+# swfluxperiod      = 2628000.0,
+#
+# startdate1 = 19920101,
+# lwfluxstartdate2  = 180000,
+# lwfluxperiod      = 2628000.0,
+#
+# startdate1 = 19920101,
+# swdownstartdate2  = 180000,
+# swdownperiod      = 2628000.0,
+#
+# startdate1 = 19920101,
+# lwdownstartdate2  = 180000,
+# lwdownperiod      = 2628000.0,
+#
+# startdate1 = 19920101,
+# climsststartdate2  = 180000,
+# climsstperiod      = 2628000.0,
+# climsstTauRelax    = 0.0,
+#
+# startdate1 = 19920101,
+# climsssstartdate2  = 180000,
+# climsssperiod      = 2628000.0,
+# climsssTauRelax    = 4142330.0,
+#
+# hfluxfile         = ' ',
+# sfluxfile         = ' ',
+# ustressfile       = ' ',
+# vstressfile       = ' ',
+# atempfile         = 'exf_files/surfAirTemp.bin',
+# aqhfile           = 'exf_files/surfAirHumidity.bin',
+# uwindfile         = 'exf_files/windForcing.bin',
+# vwindfile         = 'exf_files/katWindForcing.bin',
+#evapfile          = 'evap.labsea1979',
+#precipfile        = ' ',
+# lwfluxfile        = ' ',
+# swfluxfile        = ' ',
+# lwdownfile        = 'exf_files/longwaveDown.bin',
+# swdownfile        = 'exf_files/shortwaveDown.bin',
+# runoffFile        = ' '
+# climsstfile       = ' ',
+# climsssfile       = 'exf_files/surfSalinity.bin',
+#
+ &
+
+# *********************
+ &EXF_NML_03
+ &
+
+# *********************
+ &EXF_NML_04
+ &
+# *********************
+ &EXF_NML_OBCS
+ obcsWstartdate1 = 19911216,
+ obcsWstartdate2   = 000000,
+ obcsWperiod       = 2592000.0,
+
+ obcssstartdate1 = 19911216,
+ obcsSstartdate2   = 000000,
+ obcsSperiod       = 2592000.0,
+
+# startdate1 = 19920101,
+# obcsNstartdate2   = 000000,
+# obcsNperiod       = 2592000.0,
+#
+# startdate1 = 19920101,
+#siobSstartdate2   = 180000,
+#siobSperiod       = 31622400.0,
+#
+# startdate1 = 19920101,
+# siobEstartdate2   = 180000,
+# siobEperiod       = 2628000.0,
+#
+# startdate1 = 19920101,
+# siobWstartdate2   = 180000,
+# siobWperiod       = 2628000.0,
+ &

@@ -1,0 +1,1 @@
+watch "if test -f ../run/STDOUT.0000; then grep rhsMax ../run/STDOUT.0000 | tail; grep rhsMax ../run/STDOUT.0000 | wc; tail ../run/STDOUT.0000; grep SURF_ADJ ../run/STDOUT.0000 | tail; echo $(grep time_tsnumber ../run/STDOUT.0000 |tail -n 1 | rev | cut -c -7 | rev)/864 | bc; grep time_tsnumber ../run/STDOUT.0000 | tail -n 1; fi"

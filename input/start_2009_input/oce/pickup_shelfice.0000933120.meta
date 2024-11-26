@@ -1,0 +1,13 @@
+ nDims = [   2 ];
+ dimList = [
+   240,    1,  240,
+   416,    1,  416
+ ];
+ dataprec = [ 'float64' ];
+ nrecords = [          2 ];
+ timeStepNumber = [     933120 ];
+ timeInterval = [  9.331200000000E+07 ];
+ nFlds = [    2 ];
+ fldList = {
+ 'SHI_mass' 'R_Shelfi'
+ };

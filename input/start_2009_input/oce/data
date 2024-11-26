@@ -1,0 +1,116 @@
+#:::====================
+# | Model parameters |
+# ====================
+#
+# Continuous equation parameters
+ &PARM01
+# momViscosity=.FALSE.,
+# momForcing=.FALSE.,
+# momAdvection=.False.,
+# momstepping=.FALSE.,
+# tempstepping=.FALSE.,
+# saltstepping=.FALSE.,
+# momPressureForcing=.FALSE.,
+ Tref = 36*-1.9,
+ Sref = 36*34.4,
+ viscAr=1.E-4,
+# viscAh=40,
+ viscAhGrid=.01,
+ viscA4Grid=.001,
+ viscC2leith=2,
+ viscC2leithD=2,
+ viscAhMax = 600,
+# viscAhGrid=0.04,
+# viscA4Grid=0.002,
+ no_slip_sides=.TRUE.,
+ no_slip_bottom=.TRUE.,
+ diffKhT= 3.,
+ diffKrT=5.E-5,
+ diffKhS= 3.,
+ diffKrS=5.E-5,
+ bottomDragQuadratic=2.5E-3,
+ staggerTimestep = .true.,
+ tempAdvScheme=77,
+ saltAdvScheme=77,
+ vectorInvariantMomentum = .true.,
+## momImplVertAdv=.true.,
+# tempImplVertAdv=.true.,
+# saltImplVertAdv=.true.,
+ eostype='JMD95Z',
+ tAlpha = 3.733E-5,
+ sBeta  = 7.8434E-4,
+ HeatCapacity_cp = 3974.0,
+ rhoconst = 1030,
+ rhoNil=1000,
+ gravity=9.81,
+ gBaro=9.81,
+ implicitDiffusion = .true.,
+ implicitViscosity = .true.,
+ rigidLid=.FALSE.,
+ implicitFreeSurface=.TRUE.,
+# useRealFreshWaterFlux = .true.,
+ exactConserv=.TRUE.,
+ nonlinFreeSurf=4,
+ hfacmin = 0.02,
+ hFacSup=2.0,
+ hfacinf = 0.02,
+ readBinaryPrec=64,
+ debuglevel = 1,
+ useSingleCpuIO=.TRUE.,
+ globalFiles=.TRUE.,
+ bottomVisc_pCell=.TRUE.,
+ selectCoriMap=0,
+ f0=-1.e-4,
+ selectImplicitDrag=2,
+ selectBotDragQuadr=2
+ &
+
+# Elliptic solver parameters
+ &PARM02
+ cg2dMaxIters=600,
+ cg2dTargetResidual=1.E-14,
+ cg2dmincolumneps = 5,
+ pReleaseVisc=2,
+ thincolDamp=100.,
+# printResidualFreq=200,
+ &
+
+ &PARM03
+ niter0=0,
+# endTime=186624000,
+ deltaT=100.,
+ nTimesteps=2000
+# forcing_In_AB=.false.,
+# abEps=0.1,
+ cAdjFreq = -1,
+ pChkptFreq=31104000,
+ chkptFreq=432000,
+ dumpFreq=31104000,
+ monitorSelect=1,
+ monitorFreq=86400.,
+ dumpInitAndLast=.false.
+# pickupsuff='ckptA'
+ &
+
+# Gridding parameters
+ &PARM04
+ usingCartesianGrid=.TRUE.,
+ usingSphericalPolarGrid=.FALSE.,
+# delX=300*1500
+# delY=600*1500
+ delr = 86*25,
+ delXfile='delX_oce.bin',
+ delYfile='delY_oce.bin',
+ xgOrigin =0,
+ ygOrigin =0,
+ &
+
+# Input datasets
+ &PARM05
+ bathyfile = 'bathy_mod.bin',
+ hydrogthetafile = 'theta.init.2006.0',
+ hydrogsaltfile = 'salt.init.2006.0',
+ psurfinitfile = 'etainit.bin',
+# uvelinitfile='uvel_init.bin'
+# vvelinitfile='vvel_init.bin'
+ &

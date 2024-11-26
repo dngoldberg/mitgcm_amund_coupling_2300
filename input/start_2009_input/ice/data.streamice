@@ -1,0 +1,83 @@
+# ===================================
+# | Parameters for STREAMICE package |
+# ===================================
+ &STREAMICE_PARM01
+ streamice_density = 917.,
+ streamice_density_ocean_avg = 1027,
+ n_basal_friction = 0.3333,
+ B_glen_isothermal = 700,
+ C_basal_fric_const = 80,
+ n_glen = 3.0,
+ eps_glen_min = 1.0e-6,
+ eps_u_min = 1.0e-5,
+ streamice_cg_tol = 1.0e-7,
+ STREAMICE_lower_cg_tol = .true.,
+ STREAMICE_chkresidconvergence=.true.
+ STREAMICE_chkfixedptconvergence=.true.
+ streamice_nonlin_tol = 1.e-6,
+ streamice_nonlin_tol_fp = 1.0e-6,
+ streamice_max_cg_iter = 20000,
+ streamice_max_nl_iter = 80,
+ STREAMICEcalveMaskFile = ' ',
+ STREAMICE_move_front = .false.,
+ STREAMICE_calve_to_mask = .false.,
+ streamice_CFL_factor = 0.5,
+ STREAMICE_dump_mdsio = .true.,
+ STREAMICEAdotConfig='FILE',
+ STREAMICEAdotFile='SMB_racmo.bin',
+ STREAMICEBdotConfig='FILE',
+ STREAMICEBdotFile='',
+ streamice_bdot_depth_nomelt = 0.
+ streamice_bdot_depth_maxmelt = -700.
+ streamice_bdot_maxmelt = 50.
+ streamice_bdot_exp = 1.
+ STREAMICEbasalTracConfig='UNIFORM',
+ STREAMICEGlenConstConfig='FILE',
+ STREAMICEthickInit='FILE',
+ STREAMICEtopogFile = 'topog.bin',
+ streamicethickFile = 'BedMachineThickMod.bin',
+ STREAMICEglenconstfile = 'BglenPattyn.bin',
+ STREAMICEbasaltracFile = 'Beta2009_30.bin'
+ streamicehmaskfile = 'hmask.bin',
+ STREAMICEuFaceBdryFile = 'ufacemask.bin',
+ STREAMICEvFaceBdryFile = 'vfacemask.bin',
+ STREAMICE_diagnostic_only=.true.,
+ streamice_allow_reg_coulomb = .true.
+ &
+
+ &STREAMICE_PARM02
+ &
+
+ &STREAMICE_PARMPETSC
+ PETSC_SOLVER_TYPE = 'CG',
+ PETSC_PRECOND_TYPE = 'BLOCKJACOBI',
+ streamice_use_petsc = .true. 
+ streamice_petsc_pcfactorlevels=5
+ &
+
+ &STREAMICE_PARMOAD
+ streamice_nonlin_tol_adjoint_rl = 1.e-2,
+ STREAMICE_OAD_petsc_reuse=.true.,
+ PETSC_PRECOND_OAD='BLOCKJACOBI'
+ &
+
+ &STREAMICE_COST
+ streamice_wgt_vel = 2.
+ streamice_wgt_vel_norm = 0.0
+ streamice_wgt_tikh_bglen = 1.e5
+ streamice_wgt_tikh_beta = 1.e5
+ streamice_wgt_surf = 0.0
+ streamice_wgt_prior_bglen = .0001
+# STREAMICEvelOptimTCBasename = 'velocity_constraints/velobsMoug'
+ STREAMICEvelOptimTCBasename = 'velobs'
+ STREAMICEvelOptimSnapBasename = 'velobs'
+# STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOM_surf'
+ STREAMICEBglenCostMaskFile = 'BglenPattynMask.bin'
+ STREAMICE_do_timedep_cost = .false.
+ STREAMICE_do_snapshot_cost = .true.
+# streamice_vel_cost_timesteps = 60 72 84 96 108 120 132 144 156
+# streamice_surf_cost_timesteps = 36 96 156
+ &
+
+ &STREAMICE_PARM03
+ &

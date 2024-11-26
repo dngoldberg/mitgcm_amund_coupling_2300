@@ -1,0 +1,1 @@
+ssh -i ~/.ssh/geos_rsa shin "cd /home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/COUPLING; ln -s /home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling/python_scripts/make_update_plots.py .;source ~/.bashrc; python make_update_plots.py"
