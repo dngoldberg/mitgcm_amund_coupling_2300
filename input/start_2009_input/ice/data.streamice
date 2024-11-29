@@ -24,7 +24,7 @@
  streamice_CFL_factor = 0.5,
  STREAMICE_dump_mdsio = .true.,
  STREAMICEAdotConfig='FILE',
- STREAMICEAdotFile='SMB_racmo.bin',
+ STREAMICEAdotFile = 'SMB_racmo.bin',
  STREAMICEBdotConfig='FILE',
  STREAMICEBdotFile='',
  streamice_bdot_depth_nomelt = 0.

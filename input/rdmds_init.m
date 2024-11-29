@@ -13,10 +13,10 @@ function rdmds_init(PAS,nx_in,ny_in,zmod,gx,gy,smoothnum,ystart_in,yend_in)
 
 global sub_dir
 
-ocedatafile = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling/input/' sub_dir '/oce/data'];
-exfdatafile = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling/input/' sub_dir '/oce/data.exf'];
-caldatafile = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling/input/' sub_dir '/oce/data.cal'];
-obcsdatafile = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling/input/' sub_dir '/oce/data.obcs'];
+ocedatafile = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/input/' sub_dir '/oce/data'];
+exfdatafile = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/input/' sub_dir '/oce/data.exf'];
+caldatafile = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/input/' sub_dir '/oce/data.cal'];
+obcsdatafile = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/input/' sub_dir '/oce/data.obcs'];
 
 
 close all
@@ -146,36 +146,39 @@ z2 = zface;
 
 %load([sub_dir '/bdryDatapahol' num2str(PAS) '.mat']);
 %load([sub_dir '/initpahol' num2str(PAS) '.mat']);
-load([sub_dir '/bdryDatapahol' num2str(PAS) '.mat']);
-load([sub_dir '/initpahol' num2str(PAS) '.mat']);
+load ([sub_dir '/naughtenClim.mat']);
+load ([sub_dir '/slices_anom_forcing.mat']);
+load ([sub_dir '/bdryDatapahol30.mat']);
 
 if (PAS<100)
 z = -z;
 end
 
-if((ystart_in ~= ystart) & (ystart_in~=0))
+if((ystart_in < year_array(1)) & (ystart_in~=0))
     error('regional data has wrong start year')
 end
 
-T_init = zeros(ny,nx,nz);
-S_init = zeros(ny,nx,nz);
+T_init = NaN(ny,nx,nz);
+S_init = NaN(ny,nx,nz);
 
+Tinit = T2005;
+Sinit = S2005;
 
+nx_forcing = size(Tinit,2);
+ny_forcing = size(Tinit,1);
 
-for i=1:ny; 
-    for j=1:size(Tinit,2); 
+for i=1:ny_forcing; 
+    for j=1:nx_forcing; 
         T_init(i,j,:) = interp1(z,squeeze(Tinit(i,j,:)),-zmid);
-%         T_init(i,j,:) = inpaint_nans(T_init(i,j,:),1);
         S_init(i,j,:) = interp1(z,squeeze(Sinit(i,j,:)),-zmid);
-%         S_init(i,j,:) = inpaint_nans(S_init(i,j,:),1);
     end
 end
 
 T_init_prof = zeros(1,1,nz);
 S_init_prof = zeros(1,1,nz);
 for k=1:nz;
-    Tlayer = T_init(:,1:size(Tinit,2),k);
-    Slayer = S_init(:,1:size(Tinit,2),k);
+    Tlayer = T_init(1:ny_forcing,1:nx_forcing,k);
+    Slayer = S_init(1:ny_forcing,1:nx_forcing,k);
     T_init_prof(k) = mean(Tlayer(~isnan(Tlayer)));
     S_init_prof(k) = mean(Slayer(~isnan(Slayer)));
 end
@@ -219,17 +222,45 @@ write_coupled_input(['salt.init.' num2str(ystart_in) '.' num2str(PAS)],permute(S
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+dstart = round(time2num(ystart_in-year_array(1)));
 
-n_months = size(Sbotbdry,3);
-
+n_months = 12*(length(year_array) - (dstart));
 
 z=double(-z);
 z2=double(-z2);
 
-S_south = Sbotbdry; S_south = permute(S_south,[2 1 3]);
-T_south = Tbotbdry; T_south = permute(T_south,[2 1 3]);
-V_south = Vbotbdry; V_south = permute(V_south,[2 1 3]);
-U_south = Ubotbdry; U_south = permute(U_south,[2 1 3]);
+V_south = Vbotbdry; 
+U_south = Ubotbdry; 
+
+V_southPAS = permute(V_south,[2 1 3]);
+U_southPAS = permute(U_south,[2 1 3]);
+
+
+% need USouth and VSoutn
+PASyears = size(U_south,3)/12;
+U_south = zeros(nx_forcing,length(z),n_months);
+V_south = zeros(nx_forcing,length(z),n_months);
+U_south(:,:,1:(12*PASyears)) = U_southPAS;
+V_south(:,:,1:(12*PASyears)) = V_southPAS;
+U_south(:,:,(12*PASyears+1):end) = repmat(U_southPAS(:,:,(end-11):end),[1 1 length(year_array)-dstart-PASyears]);
+V_south(:,:,(12*PASyears+1):end) = repmat(V_southPAS(:,:,(end-11):end),[1 1 length(year_array)-dstart-PASyears]);
+
+
+% now, to create S_south and T_south!
+S_south = zeros(nx_forcing,length(z),n_months);
+T_south = zeros(nx_forcing,length(z),n_months);
+
+SbotClim = permute(SbotClim,[2 1 3]);
+TbotClim = permute(TbotClim,[2 1 3]);
+
+for i = 1:(length(year_array) - (ystart_in-year_array(1)));
+    for j=1:12;
+        S_south(:,:,(i-1)*12+j) = ...
+            SbotClim(:,:,j) + SbotAnomslice(:,:,i+dstart);
+        T_south(:,:,(i-1)*12+j) = ...
+            TbotClim(:,:,j) + TbotAnomslice(:,:,i+dstart);
+    end
+end
 
 %S_south(120:end,:,:)=nan;
 %T_south(120:end,:,:)=nan;
@@ -247,7 +278,7 @@ V_Int = zeros(nx+gx,nz,n_months);
 [X,Y] = meshgrid(linspace(1,nx,nx),z); Y=Y';X=X';
 zmid = .5 * (z2(1:end-1)+z2(2:end));
 [X2,Y2] = meshgrid(linspace(1,nx,nx),zmid); Y2=Y2';X2=X2';
-for t=1:n_months
+for t=1:n_months;
     S_time = zeros(nx,length(z)); S_time((size(S_south,1)+1):end,:)=nan;
     T_time = zeros(nx,length(z)); T_time((size(S_south,1)+1):end,:)=nan;
     U_time = zeros(nx,length(z)); U_time((size(S_south,1)+1):end,:)=nan;
@@ -316,12 +347,43 @@ end
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-S_west = Sleftbdry; S_west = permute(S_west,[2 1 3]);
-T_west = Tleftbdry; T_west = permute(T_west,[2 1 3]);
-U_west = Uleftbdry; U_west = permute(U_west,[2 1 3]);
-V_west = Vleftbdry; V_west = permute(V_west,[2 1 3]);
+
+U_west = Uleftbdry; 
+V_west = Vleftbdry; 
+
+V_westPAS = permute(V_west,[2 1 3]);
+U_westPAS = permute(U_west,[2 1 3]);
+
+
+% need USouth and VSoutn
+PASyears = size(U_west,3)/12;
+U_west = zeros(ny_forcing,length(z),n_months);
+V_west = zeros(ny_forcing,length(z),n_months);
+U_west(:,:,1:(12*PASyears)) = U_westPAS;
+V_west(:,:,1:(12*PASyears)) = V_westPAS;
+U_west(:,:,(12*PASyears+1):end) = repmat(U_westPAS(:,:,(end-11):end),[1 1 length(year_array)-dstart-PASyears]);
+V_west(:,:,(12*PASyears+1):end) = repmat(V_westPAS(:,:,(end-11):end),[1 1 length(year_array)-dstart-PASyears]);
+
+% now, to create S_south and T_south!
+S_west = zeros(ny_forcing,length(z),n_months);
+T_west = zeros(ny_forcing,length(z),n_months);
+
+SleftClim = permute(SleftClim,[2 1 3]);
+TleftClim = permute(TleftClim,[2 1 3]);
+
+for i = 1:(length(year_array) - (ystart_in-year_array(1)));
+    for j=1:12;
+        S_west(:,:,(i-1)*12+j) = ...
+            SleftClim(:,:,j) + SleftAnomslice(:,:,i+dstart);
+        T_west(:,:,(i-1)*12+j) = ...
+            TleftClim(:,:,j) + TleftAnomslice(:,:,i+dstart);
+    end
+end
+
+%%%%%%
+
 
 [X,Y] = meshgrid(linspace(1,ny,ny),z); Y=Y';X=X';
 [X2,Y2] = meshgrid(linspace(1,ny,ny),zmid); Y2=Y2';X2=X2';
@@ -330,6 +392,11 @@ T_Int = zeros(ny+gy,nz,n_months);
 U_Int = zeros(ny+gy,nz,n_months);
 V_Int = zeros(ny+gy,nz,n_months);
 for t=1:n_months
+    S_time = zeros(ny,length(z)); S_time((size(S_west,1)+1):end,:)=nan;
+    T_time = zeros(ny,length(z)); T_time((size(S_west,1)+1):end,:)=nan;
+    U_time = zeros(ny,length(z)); U_time((size(S_west,1)+1):end,:)=nan;
+    V_time = zeros(ny,length(z)); V_time((size(S_west,1)+1):end,:)=nan;
+    
     S_time = smooth_obc(S_west(:,:,t),smoothnum);
     T_time = smooth_obc(T_west(:,:,t),smoothnum);
     U_time = smooth_obc(U_west(:,:,t),smoothnum);

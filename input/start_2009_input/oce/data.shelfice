@@ -5,7 +5,7 @@
  SHELFICEwriteState=.true.,
  SHELFICEconserve=.true.,
  SHELFICEboundaryLayer = .true.,
- shelficetopofile = 'shelftopo.bin',
+ shelficetopofile = 'shelftopo.bin.80',
  shelficemassfile = 'shelficemassinit.bin',
  SHELFICEuseGammaFrict = .true.,
  SHELFICEDragQuadratic = .006,

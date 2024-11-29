@@ -1,14 +1,12 @@
 function gen_mesh(use_2004,PAS,weert,dig_depth,gamma_depth,gammaT,cd,bc_setup)
 
 % gen_mesh(use_2004,PAS,weert,dig_depth,gamma_depth,gammaT,cd,bc_setup)
+% gen_mesh(false,80,false,80,200,0.00014,.006,false)
 
 ice_setup = true;
 oce_setup = true;
 
-if (PAS~=20)
-    ice_setup = false;
-    oce_setup = false;
-end
+
 
 
 
@@ -51,16 +49,16 @@ Yuniform = unif_bounds(3):1e3:unif_bounds(4);
  
 
 npx_oce = 16;
-npy_oce = 16;
+npy_oce = 32;
 
 npx_ice = 8;
 npy_ice = 16;
 
-oce_extent_y_init = [-7.12e5 -2e5];
+oce_extent_y_init = [-7.12e5 0e5];
 ny_init = diff(oce_extent_y_init) / npy_oce / dy0;
 nyoce = ceil(ny_init) * npy_oce;
 
-oce_extent_x_init = [-1.7e6 -1.4e6];
+oce_extent_x_init = [-1.7e6 -1.2e6];
 nx_init = diff(oce_extent_x_init) / npx_oce / dx0;
 nxoce = ceil(nx_init) * npx_oce;
 
@@ -81,7 +79,7 @@ x_var = cumsum(dx_var);
 x_mesh = [(x_mesh_oce(1)-fliplr(x_var)) x_mesh_oce (x_mesh_oce(end)+x_var)];
 y_mesh = [(y_mesh_oce(1)-fliplr(y_var)) y_mesh_oce (y_mesh_oce(end)+y_var)];
 
-x_mesh_oce = [x_mesh_oce (x_mesh_oce(end)+x_var(1:(2*npx_oce)))];
+%x_mesh_oce = [x_mesh_oce (x_mesh_oce(end)+x_var(1:(2*npx_oce)))];
 x_mesh_oce_mid = .5 * (x_mesh_oce(1:end-1)+x_mesh_oce(2:end));
 nxoce = length(x_mesh_oce_mid);
 
@@ -127,22 +125,10 @@ length(y_mesh_mid)/npy_ice
 [xoce yoce] = meshgrid(x_mesh_oce_mid,y_mesh_oce_mid);
 
 
-% subplot(1,2,1);
-% pcolor(Xuniform,Yuniform,sqrt(vxout.^2+vyout.^2));
-% shading flat;
-% subplot(1,2,2);
-% pcolor(Xuniform,Yuniform,dem_interp_uniform); shading flat
-% hold on
-% contour(Xuniform,Yuniform,mask==3,[.5 .5],'k'); 
-% hold off
-% hold on
-% plot(xoce(1:10:end,1:10:end),yoce(1:10:end,1:10:end),'k.');
-% hold off
-
 internal_grid_x = ind1x:ind2x;
 internal_grid_y = ind1y:ind2y;
 
-zMod = -12.5:-25:-2140;
+zMod = -12.5:-25:-2425;
 
 save([sub_dir '/meshcoords.mat'],'x_mesh_mid', 'y_mesh_mid', 'x_mesh_oce_mid', 'y_mesh_oce_mid', ...
     'internal_grid_x','internal_grid_y','diffx','diffy','zMod');
@@ -194,47 +180,52 @@ end
 
 % pas=20: paris2 mean
 % pas=30: rcp85 mean
+% pas=300: ssp585_2300 corrected
 
-if (PAS>1 & PAS<100);
 
- if (PAS==20);
+
+if (PAS==20);
      exptstr = 'Paris2Mean';
- elseif (PAS==30);
+elseif (PAS==30);
      exptstr = 'rcp85Mean';
- elseif (PAS==10)
+elseif (PAS==10)
      exptstr = 'BaseClimMean'
- else 
+elseif (PAS==80)
+     exptstr = 'CESMRCP852300'
+else 
      error('bad PAS code')
- end
+end
 
- eval(['!ln -s /home/dgoldber/network_links/geosIceOcean/dgoldber/pahol_output/naughten_jas/bdryDatapahol' exptstr '.mat ' sub_dir '/bdryDatapahol' num2str(PAS) '.mat']);
- eval(['!ln -s /home/dgoldber/network_links/geosIceOcean/dgoldber/pahol_output/naughten_jas/initpahol' exptstr '.mat ' sub_dir '/initpahol' num2str(PAS) '.mat']);
+eval(['!ln -s /home/dgoldber/network_links/geosIceOcean/dgoldber/pahol_output/naughten_jas/bdryDatapahol' 'rcp85Mean' '.mat ' sub_dir '/bdryDatapahol' num2str(30) '.mat']);
+eval(['!ln -s /exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/prepare_2300_data/naughtenClim.mat ' sub_dir '/naughtenClim.mat']);
+eval(['!ln -s /exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/prepare_2300_data/slices_anom_forcing.mat ' sub_dir '/slices_anom_forcing.mat']);
+
  
-else
-
-save zmod.mat zMod
-if (calc_bounds);
- calc_bounds_t = 'True';
-else
- calc_bounds_t = 'False';
-end
-
-if (calc_init);
- calc_init_t = 'True';
-else
- calc_init_t = 'False';
-end
-
-
-str=(['!python ../python_scripts/readOcedataRegional.py ' num2str(PAS) ' ' ...
-       num2str(ystart) ' ' ...
-       num2str(yend) ' ' ...
-       sub_dir ' ' ...
-       calc_bounds_t ' ' ...
-       calc_init_t]);
-str
-eval(str)
-end
+%else
+% 
+% save zmod.mat zMod
+% if (calc_bounds);
+%  calc_bounds_t = 'True';
+% else
+%  calc_bounds_t = 'False';
+% end
+% 
+% if (calc_init);
+%  calc_init_t = 'True';
+% else
+%  calc_init_t = 'False';
+% end
+% 
+% 
+% str=(['!python ../python_scripts/readOcedataRegional.py ' num2str(PAS) ' ' ...
+%        num2str(ystart) ' ' ...
+%        num2str(yend) ' ' ...
+%        sub_dir ' ' ...
+%        calc_bounds_t ' ' ...
+%        calc_init_t]);
+% str
+% eval(str)
+%end
 
 if (bc_setup)
 rdmds_init(PAS,nxoce,nyoce,zMod,0,0,2,ystart,yend);
@@ -242,11 +233,6 @@ end
 if (oce_setup)
 gendata(PAS,nxoce,nyoce,zMod,0,0,2,1030,ystart,dig_depth,gamma_depth,gammaT,cd);
 end
-
-
-
-
-
 
 
  

@@ -29,32 +29,32 @@ create_inputs_couplesnap = false;
 create_inputs_coupletc = false;
 
 if (use_2004)
- sub_dir = 'start_2004_input'
- oce_outdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/OCE_SPINUP/run_2004_' num2str(PAS) '_' ...
-     num2str(gamma_depth) '_' num2str(cd) '_' num2str(gammaT) '_' num2str(dig_depth)]
- ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT/run_ad_2004']
- optimnumber = 200;
- s = dir([ice_optimdir '/runoptiter*']);
- if (length(s)>0);
-  create_inputs_couplesnap = true;
-  sname = s(end).name;
-  optimnumbercouplesnap=str2num(sname(end-2:end));
- end
- ice_optimdirtc = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT_TC/run_ad_2004_' num2str(PAS) '_' chars 'NoCpomErr4yr']
- s = dir([ice_optimdirtc '/runoptiter*'])
- if (length(s)>0);
-  create_inputs_coupletc = true;
-  sname = s(end).name;
-  optimnumbercoupletc=str2num(sname(end-2:end));
- end
+%  sub_dir = 'start_2004_input'
+%  oce_outdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/OCE_SPINUP/run_2004_' num2str(PAS) '_' ...
+%      num2str(gamma_depth) '_' num2str(cd) '_' num2str(gammaT) '_' num2str(dig_depth)]
+%  ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT/run_ad_2004']
+%  optimnumber = 200;
+%  s = dir([ice_optimdir '/runoptiter*']);
+%  if (length(s)>0);
+%   create_inputs_couplesnap = true;
+%   sname = s(end).name;
+%   optimnumbercouplesnap=str2num(sname(end-2:end));
+%  end
+%  ice_optimdirtc = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT_TC/run_ad_2004_' num2str(PAS) '_' chars 'NoCpomErr4yr']
+%  s = dir([ice_optimdirtc '/runoptiter*'])
+%  if (length(s)>0);
+%   create_inputs_coupletc = true;
+%   sname = s(end).name;
+%   optimnumbercoupletc=str2num(sname(end-2:end));
+%  end
 else
  sub_dir = 'start_2009_input'
- oce_outdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/OCE_SPINUP/run_2009_' num2str(PAS) '_' ...
+ oce_outdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE_2300/OCE_SPINUP/run_2009_' num2str(PAS) '_' ...
      num2str(gamma_depth) '_' strrep(num2str(cd),'0.','.') '_' strrep(num2str(gammaT),'0.','.') '_' num2str(dig_depth)]
  if (weert)
-     ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT/run_ad_2009_weert']
+     ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE_2300/ICE_INIT/run_ad_2009_weert']
  else
-     ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT/run_ad_2009_coul']
+     ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE_2300/ICE_INIT/run_ad_2009_coul']
  end
  optimnumber = 200;
  s = dir([ice_optimdir '/runoptiter*'])
@@ -63,12 +63,14 @@ else
   sname = s(end).name;
   optimnumbercouplesnap=str2num(sname(end-2:end));
  end
- ice_optimdirtc = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT_TC/run_ad_2009_' num2str(PAS) '_myiter_' chars2]
+ ice_optimdirtc = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE_2300/ICE_INIT_TC/run_ad_2009_' num2str(PAS) '_myiter_' chars2]
  s = dir([ice_optimdirtc '/runoptiter*'])
  if (length(s)>0);
   create_inputs_coupletc = true;
   sname = s(end).name;
   optimnumbercoupletc=str2num(sname(end-2:end));
+ else
+    optimnumbercoupletc='000'; 
  end
 end
 disp(['optimnumbercoupletc:'  num2str(optimnumbercoupletc) ' ' ice_optimdirtc]);

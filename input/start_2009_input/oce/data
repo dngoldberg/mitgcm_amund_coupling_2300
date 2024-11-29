@@ -98,7 +98,7 @@
  usingSphericalPolarGrid=.FALSE.,
 # delX=300*1500
 # delY=600*1500
- delr = 86*25,
+ delr = 97*25,
  delXfile='delX_oce.bin',
  delYfile='delY_oce.bin',
  xgOrigin =0,
@@ -108,9 +108,9 @@
 # Input datasets
  &PARM05
  bathyfile = 'bathy_mod.bin',
- hydrogthetafile = 'theta.init.2006.0',
- hydrogsaltfile = 'salt.init.2006.0',
- psurfinitfile = 'etainit.bin',
+ hydrogthetafile = 'theta.init.2010.80',
+ hydrogsaltfile = 'salt.init.2010.80',
+ psurfinitfile = 'etainit.bin.80',
 # uvelinitfile='uvel_init.bin'
 # vvelinitfile='vvel_init.bin'
  &

@@ -1,4 +1,4 @@
-load /home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling/input/start_2009_input/meshcoords.mat
+load /home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/input/start_2009_input/meshcoords.mat
 addpath('/home/dgoldber/network_links/ice_data/ThwaitesDataProphet/CODE/');
 
 salt = ncread('/home/dgoldber/scratch/globus/climatology_from_obs_1995-2017/obs_salinity_1995-2017_8km_x_60m_clipped.nc','salinity');
@@ -8,6 +8,7 @@ Y = ncread('/home/dgoldber/scratch/globus/ccsm4_RCP85/1995-2300/CCSM4_RCP85_sali
 Z = ncread('/home/dgoldber/scratch/globus/ccsm4_RCP85/1995-2300/CCSM4_RCP85_salinity_8km_x_60m_clipped_1995.nc','z');
 
 x_mesh_oce_mid=x_mesh_oce_mid(1:240);
+y_mesh_oce_mid=y_mesh_oce_mid(1:416);
 [x y]=meshgrid(x_mesh_oce_mid,y_mesh_oce_mid);
 [X Y] = meshgrid(X,Y);
 
@@ -61,6 +62,7 @@ SleftAnomslice = zeros(length(y_mesh_oce_mid),length(znaught),length(years));
 TleftAnomslice = zeros(length(y_mesh_oce_mid),length(znaught),length(years));
 SbotAnomslice = zeros(length(x_mesh_oce_mid),length(znaught),length(years));
 TbotAnomslice = zeros(length(x_mesh_oce_mid),length(znaught),length(years));
+
 
 
 X = ncread('/home/dgoldber/scratch/globus/ccsm4_RCP85/1995-2300/CCSM4_RCP85_salinity_8km_x_60m_clipped_1995.nc','x');
