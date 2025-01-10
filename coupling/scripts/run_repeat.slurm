@@ -2,7 +2,7 @@
 #!/bin/sh
 #SBATCH --time=23:00:00
 #SBATCH --exclusive
-#SBATCH --nodes=2
+#SBATCH --nodes=4
 #SBATCH --tasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=standard
@@ -94,7 +94,7 @@ if [[ $3 == 0 ]]; then
  ncoupled_steps_max=480
  save_steps=60
 else
- ncoupled_steps_max=72
+ ncoupled_steps_max=36
  save_steps=36
 fi
 rollingChkptTime=$coupled_step_time
@@ -105,7 +105,7 @@ echo "ocePickupStep: " $ocePickupStepPad
 
 input_oce_dir=../../input/start_$1_input/oce
 input_ice_dir=../../input/start_$1_input/ice/
-pickup_oce_dir=../../oce_spinup/run_${1}_${5}_${Gtrans}_${cfric}_${shitrans}_80
+pickup_oce_dir=../../oce_spinup/run_${1}_${3}_${Gtrans}_${cfric}_${shitrans}_80
 
 echo "PICKUP OCE DIR: " $pickup_oce_dir
 
@@ -277,13 +277,13 @@ sed "s/.*obwsfile.*/$newobcs/" data.obcs > data.temp; mv data.temp data.obcs
 newobcs=" obwtfile = 'temp.obw.${PASclim}'",
 sed "s/.*obwtfile.*/$newobcs/" data.obcs > data.temp; mv data.temp data.obcs
 
-newdata=" psurfinitfile = 'etainit.$5.bin',"
+newdata=" psurfinitfile = 'etainit.$3.bin',"
 sed "s/.*psurfinitfile.*/$newdata/" data > data.temp; mv data.temp data
-newdata=" shelficetopofile = 'shelftopo.$5.bin',"
+newdata=" shelficetopofile = 'shelftopo.$3.bin',"
 sed "s/.*shelficetopofile.*/$newdata/" data.shelfice > data.temp; mv data.temp data.shelfice
-newdata=" hydrogsaltfile = 'salt.init.$yrfile.$5'"
+newdata=" hydrogsaltfile = 'salt.init.$yrfile.$3'"
 sed "s/.*hydrogsaltfile.*/$newdata/" data > data.temp; mv data.temp data
-newdata=" hydrogthetafile = 'theta.init.$yrfile.$5'"
+newdata=" hydrogthetafile = 'theta.init.$yrfile.$3'"
 sed "s/.*hydrogthetafile.*/$newdata/" data > data.temp; mv data.temp data
 newdata=" pReleaseVisc = 4,"
 sed "s/.*pReleaseVisc.*/$newdata/" data > data.temp; mv data.temp data
@@ -369,17 +369,20 @@ sed "s/.*STREAMICEglenconstfile.*/$str/" data.streamice > data.streamice.temp; m
 str=" STREAMICEbasalTracConfig='FILE',"
 sed "s/.*STREAMICEbasalTracConfig.*/$str/" data.streamice > data.streamice.temp; mv data.streamice.temp data.streamice
 
-if [ $2 == "TC" ]; then
-  rm $betafile
-  rm $bglenfile
-  ln -s ../../python_scripts/get_coupled_controls.py .
-  echo $1
-  echo $5
-  echo $invname
-  echo $iterTC
-  echo $4
-  python get_coupled_controls.py $1 $5 $invname $iterTC $4
-fi
+#if [[ $2 == TC ]]; then
+rm $betafile
+rm $bglenfile
+ln -s ../../python_scripts/get_coupled_controls.py .
+echo "INITIALISING BETA AND BGLEN"
+echo $1
+echo $5
+echo $invname
+echo $iterTC
+echo $4
+echo $2
+python get_coupled_controls.py $1 $5 $invname $iterTC $4 $2
+#fi
+
 
 if [[ $1 == 2009 ]]; then
  echo REPLACEMENT
