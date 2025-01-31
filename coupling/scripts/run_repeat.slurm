@@ -1,12 +1,13 @@
 #!/bin/sh 
 #!/bin/sh
-#SBATCH --time=23:00:00
+#SBATCH --time=6:00:00
 #SBATCH --exclusive
 #SBATCH --nodes=4
 #SBATCH --tasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=standard
 #SBATCH --qos=standard
+##SBATCH --qos=short
 ##SBATCH --reservation=shortqos
 
 module load PrgEnv-cray
@@ -94,8 +95,8 @@ if [[ $3 == 0 ]]; then
  ncoupled_steps_max=480
  save_steps=60
 else
- ncoupled_steps_max=36
- save_steps=36
+ ncoupled_steps_max=18
+ save_steps=60
 fi
 rollingChkptTime=$coupled_step_time
 ocePickupStep=$(( 5 * 311040 ))
@@ -178,6 +179,7 @@ echo "oce pickup read: " $niter_oce
 
 niter_oce_rel=$(($niter_oce-$ocePickupStep))
 num_ice=$(($coupled_step_time*$niter_ice/$timestep))
+num_ice_p1=$(($niter_oce_rel+$coupled_step_time/$timestep))
 
 if (( $num_ice < $niter_oce_rel )); then
 	#niter_oce=$(($num_ice+$ocePickupStep))
@@ -186,11 +188,29 @@ if (( $num_ice < $niter_oce_rel )); then
         sbatch --job-name=EML -A $Acc /work/n02/n02/dngoldbe/mitgcm/scripts/email_serial.slurm "${MSGEMAIL}" $SLURM_JOB_ID
 	exit
 elif (($num_ice > $niter_oce_rel )); then
-	#niter_ice=$(($niter_oce_rel*$timestep/$coupled_step_time))
-	echo "ice model pickup larger than ocean"
-        MSGEMAIL=$(echo "ERROR: ice model larger than ocean")
-        sbatch --job-name=EML -A $Acc /work/n02/n02/dngoldbe/mitgcm/scripts/email_serial.slurm "${MSGEMAIL}" $SLURM_JOB_ID
-	exit
+#	if (($num_ice == $num_ice_p1 )); then
+#		cd $SLURM_SUBMIT_DIR/../$run_ice
+#	#niter_ice=$(($niter_oce_rel*$timestep/$coupled_step_time))
+#        	for j in meta data; do 
+#                	for k in pickup pickup_streamice; do
+#                        	ls -l $k.ckptA_old.$j
+#                        	cp $k.ckptA_old.$j $k.ckptA.$j -v;
+#                	done;
+#                	for k in pickup_streamice; do
+#                        	ls -l $k.ckptA_old.$j
+#                        	cp $k.ckptA_old.$j $k.ckptAlast.$j -v;
+#                	done;
+#        	done; 	
+#		echo "ice model pickup one larger than ocean"
+#	        MSGEMAIL=$(echo "WARNING: ice model one larger than ocean; replacing pickups")
+#		sbatch --job-name=EML -A $Acc /work/n02/n02/dngoldbe/mitgcm/scripts/email_serial.slurm "${MSGEMAIL}" $SLURM_JOB_ID
+#		cd $OLDPWD
+#	else
+		echo "ice model pickup larger than ocean"
+                MSGEMAIL=$(echo "ERRIR: ice model larger than ocean; replacing pickups")
+                sbatch --job-name=EML -A $Acc /work/n02/n02/dngoldbe/mitgcm/scripts/email_serial.slurm "${MSGEMAIL}" $SLURM_JOB_ID
+		exit
+#	fi
 fi
 
 ncoupled_steps=$(($tottime/$coupled_step_time-$niter_ice))
@@ -214,6 +234,9 @@ fi
 
 cd $SLURM_SUBMIT_DIR/../$run_oce
 ln -s $input_oce_dir/* .
+
+rm data
+cp -f $input_oce_dir/data .
 
 if [[ $3 == 10 ]]; then
  newexf=" repeatPeriod      = 31104000.0,"
@@ -343,6 +366,10 @@ sed "s/.*shiCdrag.*/$newdata/" data.shelfice > data.temp; mv data.temp data.shel
 
 cd $SLURM_SUBMIT_DIR/../$run_ice
 ln -s $input_ice_dir/* .
+rm data.streamice
+cp  $input_ice_dir/data.streamice .
+rm data
+cp $input_ice_dir/data .
 
 if [ -z ${dig+x}  ]; then
 newdata1=" STREAMICEtopogFile = 'topog.bin',"
@@ -623,7 +650,7 @@ if (( $mod_save_time == 0 )); then
 fi
 cd $OLDPWD
 
-done
+done # end coupled loop
 
 
 
