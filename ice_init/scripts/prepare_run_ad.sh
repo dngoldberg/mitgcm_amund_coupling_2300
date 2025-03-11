@@ -46,6 +46,10 @@ str=" STREAMICEbasalTracConfig='UNIFORM',"
 sed "s/.*basalTracConfig.*/$str/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 
+str=" streamice_wgt_prior_bglen=.01"
+sed "s/.*streamice_wgt_prior_bglen.*/$str/" data.streamice > data.streamice.temp
+mv data.streamice.temp data.streamice
+
 if [ -z ${dig+x}  ]; then
 newdata1=" STREAMICEtopogFile = 'topog.bin',"
 else

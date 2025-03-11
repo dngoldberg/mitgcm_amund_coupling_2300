@@ -1,5 +1,5 @@
 #!/bin/sh 
-#SBATCH --time=18:00:00
+#SBATCH --time=22:00:00
 #SBATCH --exclusive
 #SBATCH --nodes=4
 #SBATCH --tasks-per-node=128
@@ -35,7 +35,7 @@ timestep=100
 tottime=373249000
 #tottime=339552000
 #tottime=155521000
-maxntime=626400
+maxntime=466760
 
 
 

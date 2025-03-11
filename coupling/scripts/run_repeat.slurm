@@ -85,7 +85,7 @@ year=2014
 if [[ $1 == 1995 ]]; then
  tottime=777600000
 else
- tottime=$(( 87 * 31104000 ))
+ tottime=$(( 287 * 31104000 ))
 # tottime=217728000
 fi
 
@@ -308,7 +308,7 @@ newdata=" hydrogsaltfile = 'salt.init.$yrfile.$3'"
 sed "s/.*hydrogsaltfile.*/$newdata/" data > data.temp; mv data.temp data
 newdata=" hydrogthetafile = 'theta.init.$yrfile.$3'"
 sed "s/.*hydrogthetafile.*/$newdata/" data > data.temp; mv data.temp data
-newdata=" pReleaseVisc = 4,"
+newdata=" pReleaseVisc = 8,"
 sed "s/.*pReleaseVisc.*/$newdata/" data > data.temp; mv data.temp data
 
 rm data.cal
@@ -399,7 +399,7 @@ sed "s/.*STREAMICEbasalTracConfig.*/$str/" data.streamice > data.streamice.temp;
 #if [[ $2 == TC ]]; then
 rm $betafile
 rm $bglenfile
-ln -s ../../python_scripts/get_coupled_controls.py .
+ln -s ../../../mitgcm_amund_coupling_2300/python_scripts/get_coupled_controls.py .
 echo "INITIALISING BETA AND BGLEN"
 echo $1
 echo $5
@@ -508,12 +508,10 @@ for (( coupled_step=1; coupled_step<=$ncoupled_steps; coupled_step++ )); do
     mv data.temp6 data.streamice
 
 
-    
+    OUT=-1 
     if (( $ncoupled_steps > 0 )); then
      srun --nodes=1 --ntasks=128 --distribution=block:block --hint=nomultithread ./mitgcmuv > out.txt 2> err.txt
      OUT=$?
-    else
-     OUT=-1
     fi
     echo $OUT
     
@@ -558,6 +556,7 @@ for (( coupled_step=1; coupled_step<=$ncoupled_steps; coupled_step++ )); do
     rm HBC*_oce.bin
     rm Vice_oce.bin Uice_oce.bin
     python vel_from_ice.py $niter_ice $1 $2 $3 $invname $4
+    #2737 2009 TC 80 iceParm3 coul
 
 #n    rm -v ../run_ice/pickup.$pickupString.* ../run_ice/pickup_streamice.$pickupString.*
     echo "COUPLED STEP OCE $coupled_step"
@@ -589,12 +588,10 @@ for (( coupled_step=1; coupled_step<=$ncoupled_steps; coupled_step++ )); do
     mv data.temp6 data
 
  
-    
+    OUT=-1 
     if (( $ncoupled_steps > 0 )); then
      srun --distribution=block:block --hint=nomultithread ./mitgcmuv > out.txt 2> err.txt
      OUT=$?
-    else
-     OUT=-1
     fi
     
     if (( OUT != 0 )); then

@@ -18,12 +18,17 @@ if [[ $3 == R ]]; then
 	echo "restarting..."
 else
 	echo "No restart"
-        bash prepare_run_fwd.sh $1 $2 140 1.e5 1.e5 20.0
+        bash prepare_run_fwd.sh 2009 80 200 coul
 fi
+
+# 1. start year
+# 2. PAS version (melt)
+# 3. snap iteration
+# 4. weert or coul
 
 echo $JOBNO
 echo $TIMEQSTART
 echo $HECACC
 # submit the job chain
-sbatch --job-name=ice$1$2 -A $HECACC run_fwd.slurm $1 $2
+sbatch --job-name=ice$1$2 -A n02-SUNSET run_fwd.slurm 2009 80 coul
 #qsub -A $HECACC run.sh

@@ -12,6 +12,7 @@ import os
 import shutil
 sys.path.append(os.environ['ROOTDIRWORK'] + '/utils/python/MITgcmutils/MITgcmutils/');
 from mds import rdmds
+from IPython import embed
 
 run_ice='run_ice_' + sys.argv[2] + '_' + sys.argv[3] + '_' + sys.argv[4] + '_' + sys.argv[5] + '_' + sys.argv[6]
 run_oce='run_oce_' + sys.argv[2] + '_' + sys.argv[3] + '_' + sys.argv[4] + '_' + sys.argv[5] + '_' + sys.argv[6]
@@ -25,6 +26,7 @@ numiter = str(sys.argv[1])
 data_ice,x,m = rdmds('../' + run_ice + '/pickup_streamice.ckptA',returnmeta=True)
 print('vel transfer ice input iter:' + numiter)
 print('vel transfer pickup iter:' + str(m['timestepnumber'][0]))
+
 
 if (int(sys.argv[1]) != m['timestepnumber'][0]):
  print('ERROR -- time step of pickup does not match')

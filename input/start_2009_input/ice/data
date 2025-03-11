@@ -54,8 +54,8 @@
 # delX=728*1000.,
 # delY=1020*1000.,
  delZ=20*100.,
- delxfile = 'delX.bin',
- delyfile = 'delY.bin',
+ delxfile = 'delX_ice.bin',
+ delyfile = 'delY_ice.bin',
 # delX=480*985.3125
 # delY=720*1036.9
  &

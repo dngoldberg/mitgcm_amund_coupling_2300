@@ -23,7 +23,8 @@ fi
 
 cd $ROOTDIR
 #git checkout branch_controls_snap_tc
-git checkout branch_parallel_compile_petsc
+#git checkout branch_parallel_compile_petsc
+git checkout master
 cd $OLDPWD
 
 

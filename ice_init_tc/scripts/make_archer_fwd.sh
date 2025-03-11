@@ -14,15 +14,7 @@
 
 
 module load PrgEnv-gnu
-module swap cray-mpich  cray-mpich/8.1.4
-module load cray-hdf5-parallel/1.12.0.3
-module load cray-netcdf-hdf5parallel/4.7.4.3
 PETSCDIR=/work/n02/n02/dngoldbe/petsc/
-
-
-# module load nco/4.9.6-gcc-10.1.0
-# module load ncview/ncview-2.1.7-gcc-10.1.0
-
 export LD_LIBRARY_PATH=/work/n02/n02/dngoldbe/petsc/lib:$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 build_dir=build_fwd
 
@@ -37,7 +29,7 @@ fi
 
 
 cd $ROOTDIR
-git checkout streamic_petsc_3_8_update
+git checkout master
 cd $OLDPWD
 
 sing_str="-B $PWD:$HOME /work/n02/n02/dngoldbe/oad_sing/openad.sif"
@@ -49,7 +41,7 @@ $ROOTDIR/tools/genmake2 -mods='../code_ice_fwd' -of=/home/n02/n02/dngoldbe/own_s
 ln -s $PETSCDIR/include/*.mod .
 echo $LD_LIBRARY_PATH
 make depend
-make
+make -j
 
 # Switch Programming Environment back
 #module swap PrgEnv-intel PrgEnv-cray

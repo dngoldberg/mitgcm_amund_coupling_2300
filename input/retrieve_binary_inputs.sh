@@ -1,4 +1,4 @@
-input_dir=/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling/input
+input_dir=/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/input
 
 for i in 2009;
 do

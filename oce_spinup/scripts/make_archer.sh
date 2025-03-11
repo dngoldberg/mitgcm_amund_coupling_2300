@@ -30,8 +30,8 @@ $ROOTDIR/tools/genmake2 -mods='../../code_oce' -of=/home/n02/n02/dngoldbe/own_sc
 #$ROOTDIR/tools/genmake2 -ieee -mods='../code ../newcode' -of=$ROOTDIR/tools/build_options/linux_amd64_gfortran -mpi
 #$ROOTDIR/tools/genmake2 -mods='../code' -mpi
 make depend
-rm SIZE.h
-ln -s ../../code_oce/SIZE.h_2 SIZE.h
+#rm SIZE.h
+#ln -s ../../code_oce/SIZE.h_2 SIZE.h
 
 make -j
 

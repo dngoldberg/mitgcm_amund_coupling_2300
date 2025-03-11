@@ -28,7 +28,7 @@ Lstdoutoce=$(ls std*)
 
 if [ $HOMEHOST != 'null' ] ; then
 
-  HOMEDIR=$HOMEROOT/AMUND_COUPLE/OCE_SPINUP
+  HOMEDIR=$HOMEROOT/AMUND_COUPLE_2300/OCE_SPINUP
 
   echo home folder $HOMEDIR
 

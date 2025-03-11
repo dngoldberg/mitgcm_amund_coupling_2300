@@ -16,10 +16,11 @@ echo Sync start seconds `date +%s` >> times
 #
 # make combined netcdf files
 #
-oce_stdout_folder=stdout_oce_files_$1_$2_$3_$4
-ice_stdout_folder=stdout_ice_files_$1_$2_$3_$4
-ice_run_folder=run_ice_$1_$2_$3_$4
-oce_run_folder=run_oce_$1_$2_$3_$4
+oce_stdout_folder=stdout_oce_files_$1_$2_$3_$4_$5
+ice_stdout_folder=stdout_ice_files_$1_$2_$3_$4_$5
+ice_run_folder=run_ice_$1_$2_$3_$4_$5
+oce_run_folder=run_oce_$1_$2_$3_$4_$5
+transfer_folder=transfer_files_$1_$2_$3_$4_$5
 
 cd $SLURM_SUBMIT_DIR/..
 
@@ -31,6 +32,7 @@ Lstdoutice=$(ls $ice_stdout_folder/std*)
 Lstdoutoce=$(ls $oce_stdout_folder/std*)
 Lparamsice=$(ls $ice_run_folder/*init*ta $ice_run_folder/R_low* $ice_run_folder/XC* $ice_run_folder/YC* $ice_run_folder/C_basal*ta $ice_run_folder/B_glen*ta $ice_run_folder/RAC*)
 Lparamsoce=$(ls $oce_run_folder/*init*ta $oce_run_folder/R_low* $oce_run_folder/XC* $oce_run_folder/YC* $oce_run_folder/RAC*)
+Ltransfer=$(ls $transfer_folder/*)
 
 if [ $HOMEHOST != 'null' ] ; then
 
@@ -43,6 +45,7 @@ if [ $HOMEHOST != 'null' ] ; then
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "mkdir -p $HOMEDIR/$ice_stdout_folder"
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "mkdir -p $HOMEDIR/$ice_run_folder"
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "mkdir -p $HOMEDIR/$oce_run_folder"
+  ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "mkdir -p $HOMEDIR/$transfer_folder"
 
   rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -p6022" -avzL *crash* $HOMEHOST:$HOMEDIR
   rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -p6022" -avzL --remove-source-files $Lsurfdiag $HOMEHOST:$HOMEDIR/$oce_run_folder
@@ -55,6 +58,8 @@ if [ $HOMEHOST != 'null' ] ; then
 
   rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -p6022" -avzL --remove-source-files $Lparamsice $HOMEHOST:$HOMEDIR/$ice_run_folder
   rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -p6022" -avzL --remove-source-files $Lparamsoce $HOMEHOST:$HOMEDIR/$oce_run_folder
+
+  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -p6022" -avzL --remove-source-files $Ltransfer $HOMEHOST:$HOMEDIR/$transfer_folder
 
 #  process_id=$!
 #  wait $process_id
