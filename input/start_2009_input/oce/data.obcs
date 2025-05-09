@@ -1,7 +1,7 @@
 # Open-boundaries
  &OBCS_PARM01
- ob_jsouth = 79*1 273*0,,
- ob_iwest = 293*1 219*0,,
+ ob_jsouth = 79*1 225*0,,
+ ob_iwest = 293*1 163*0,,
  useOBCSprescribe=.TRUE.,
  useOBCSsponge=.FALSE.,
  obsufile = 'uvel.obs.80',

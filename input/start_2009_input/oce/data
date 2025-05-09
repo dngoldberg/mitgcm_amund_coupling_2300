@@ -48,7 +48,7 @@
  implicitViscosity = .true.,
  rigidLid=.FALSE.,
  implicitFreeSurface=.TRUE.,
- useRealFreshWaterFlux = .true.,
+# useRealFreshWaterFlux = .true.,
  exactConserv=.TRUE.,
  nonlinFreeSurf=4,
  hfacmin = 0.02,
@@ -63,9 +63,9 @@
  f0=-1.e-4,
  selectImplicitDrag=2,
  selectBotDragQuadr=2
- scaleBottomDragQuadratic=.true.
- bottomDragQuadraticScDepth=50
- bottomDragQuadraticMax=2.5e-2  
+ scaleBottomDragQuadratic=.false.
+ bottomDragQuadraticScDepth=37.5
+ bottomDragQuadraticMax=2.5e-2
  &
 
 # Elliptic solver parameters
@@ -73,26 +73,26 @@
  cg2dMaxIters=600,
  cg2dTargetResidual=1.E-14,
  cg2dmincolumneps = 5,
- pReleaseVisc = 8,
+ pReleaseVisc=2,
  thincolDamp=100.,
 # printResidualFreq=200,
  &
 
  &PARM03
- niter0=48228912
+ niter0=0,
 # endTime=186624000,
- deltaT=100
- nTimesteps=25920
+ deltaT=100.,
+ nTimesteps=2000
 # forcing_In_AB=.false.,
 # abEps=0.1,
  cAdjFreq = -1,
- pChkptFreq=864000
- chkptFreq=864000
+ pChkptFreq=31104000,
+ chkptFreq=432000,
  dumpFreq=31104000,
  monitorSelect=1,
  monitorFreq=86400.,
  dumpInitAndLast=.false.
-#pickupsuff='ckptA'
+# pickupsuff='ckptA'
  &
 
 # Gridding parameters
@@ -110,7 +110,7 @@
 
 # Input datasets
  &PARM05
- bathy_mod_dig_80.bin = 'bathy_mod.bin',
+ bathyfile = 'bathy_mod.bin',
  hydrogthetafile = 'theta.init.2010.80',
  hydrogsaltfile = 'salt.init.2010.80',
  psurfinitfile = 'etainit.bin.80',

@@ -6,6 +6,7 @@ do
  for j in ice oce;
  do
   echo start_${i}_input/$j
+  scp -P 6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos dgoldber@sshpa.geos.ed.ac.uk:${input_dir}/start_${i}_input/mesh*mat ./start_${i}_input/
   scp -P 6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos dgoldber@sshpa.geos.ed.ac.uk:${input_dir}/start_${i}_input/$j/*.bin ./start_${i}_input/$j
   scp -P 6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos dgoldber@sshpa.geos.ed.ac.uk:${input_dir}/start_${i}_input/$j/*.box ./start_${i}_input/$j
   scp -P 6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos dgoldber@sshpa.geos.ed.ac.uk:${input_dir}/start_${i}_input/$j/*obw* ./start_${i}_input/$j

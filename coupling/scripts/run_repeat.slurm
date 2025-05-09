@@ -1,8 +1,8 @@
 #!/bin/sh 
 #!/bin/sh
-#SBATCH --time=6:00:00
+#SBATCH --time=12:00:00
 #SBATCH --exclusive
-#SBATCH --nodes=4
+#SBATCH --nodes=3
 #SBATCH --tasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=standard
@@ -95,8 +95,8 @@ if [[ $3 == 0 ]]; then
  ncoupled_steps_max=480
  save_steps=60
 else
- ncoupled_steps_max=18
- save_steps=60
+ ncoupled_steps_max=36
+ save_steps=18
 fi
 rollingChkptTime=$coupled_step_time
 ocePickupStep=$(( 5 * 311040 ))
@@ -283,6 +283,9 @@ then
  cp -f $pickup_oce_dir/pickups/pickup*.${ocePickupStepPad}.*ta .
 fi
 
+newdata=" scaleBottomDragQuadratic=.true.,"
+sed "s/.*scaleBottomDragQuadratic.*/$newdata/" data > data.temp; mv data.temp data
+
 newobcs=" obsufile = 'uvel.obs.${PASclim}'",
 sed "s/.*obsufile.*/$newobcs/" data.obcs > data.temp; mv data.temp data.obcs
 newobcs=" obsvfile = 'vvel.obs.${PASclim}'",
@@ -413,7 +416,7 @@ python get_coupled_controls.py $1 $5 $invname $iterTC $4 $2
 
 if [[ $1 == 2009 ]]; then
  echo REPLACEMENT
-str=" streamice_petsc_pcfactorlevels=12"
+str=" streamice_petsc_pcfactorlevels=15"
 echo $str
 sed "s/.*streamice_petsc_pcfactorlevels.*/$str/" data.streamice > data.streamice.temp; mv data.streamice.temp data.streamice
 else

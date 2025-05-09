@@ -155,12 +155,12 @@ echo $TIMEQSTART
 echo $p_value
 # submit the job chain
 
-if [[ $cal_value == "TC" ]]; then
- echo "sbatch --job-name=c${cal_value}${PAS_value}$parmn -A $p_value run_repeat_test.slurm $y_value $cal_value $PAS_value coul 20 $p_value $cfric $shitrans $depth $parmn $iter" 
- RES=$(sbatch --job-name=c${cal_value}${PAS_value}$parmn -A $p_value run_repeat_test.slurm $y_value $cal_value $PAS_value coul 20 $p_value $cfric $shitrans $depth $parmn $iter)
-else
- echo "sbatch --job-name=c${cal_value}${PAS_value}$parmn -A $p_value run_repeat.slurm $y_value $cal_value $PAS_value coul 20 $p_value $cfric $shitrans $depth $parmn $iter" 
- RES=$(sbatch --job-name=c${cal_value}${PAS_value}$parmn -A $p_value run_repeat.slurm $y_value $cal_value $PAS_value coul 20 $p_value $cfric $shitrans $depth $parmn $iter)
-fi 
+#if [[ $cal_value == "TC" ]]; then
+# echo "sbatch --job-name=c${cal_value}${PAS_value}$parmn -A $p_value run_repeat_test.slurm $y_value $cal_value $PAS_value coul 20 $p_value $cfric $shitrans $depth $parmn $iter" 
+# RES=$(sbatch --job-name=c${cal_value}${PAS_value}$parmn -A $p_value run_repeat_test.slurm $y_value $cal_value $PAS_value coul 20 $p_value $cfric $shitrans $depth $parmn $iter)
+#else
+#fi 
+echo "sbatch --job-name=c${cal_value}${PAS_value}$parmn -A $p_value run_repeat.slurm $y_value $cal_value $PAS_value coul 20 $p_value $cfric $shitrans $depth $parmn $iter" 
+RES=$(sbatch --job-name=c${cal_value}${PAS_value}$parmn -A $p_value run_repeat.slurm $y_value $cal_value $PAS_value coul 20 $p_value $cfric $shitrans $depth $parmn $iter)
 
 echo submitted $RES -y ${y_value} -c ${cal_value} -a ${PAS_value} -p ${p_value} -n $parmn -f $cfric -s $shitrans -d $depth -i $iter -r $r_flag >> job_id_list

@@ -1,7 +1,7 @@
 #!/bin/sh 
 #SBATCH --time=22:00:00
 #SBATCH --exclusive
-#SBATCH --nodes=4
+#SBATCH --nodes=3
 #SBATCH --tasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=standard
@@ -34,7 +34,7 @@ timestep=100
 #tottime=93312000
 tottime=373249000
 #tottime=339552000
-#tottime=155521000
+tottime=155521000
 maxntime=466760
 
 
@@ -125,6 +125,9 @@ fi
 if (( $new3 > $new )); then
  rm STDOUT.0001
  mv STDOUT.0000 stdout_$new3
+ mv pickup.00* pickups
+ mv pickup_streamice.00* pickups
+ mv pickup_shelfice.00* pickups
  cd ../scripts
 # sbatch --job-name=$SLURM_JOB_NAME rput_cirrus_mds.slurm
  if [ $OUT == 0 ]; then

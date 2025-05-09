@@ -1,4 +1,4 @@
-for i in run_ice_2009_Snap_80_iceParm3_coul; do 
+for i in run_ice_2009_TC_80_iceParm3_coul; do 
 	cd $i; 
 	for j in meta data; do 
 		for k in pickup pickup_streamice; do 
