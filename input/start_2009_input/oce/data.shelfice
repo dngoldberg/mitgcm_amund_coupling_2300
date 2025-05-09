@@ -9,8 +9,8 @@
  shelficemassfile = 'shelficemassinit.bin',
  SHELFICEuseGammaFrict = .true.,
  SHELFICEDragQuadratic = .006,
- shiCdrag = .006,
-# SHELFICEheatTransCoeff = 0.0285,
+ shiCdrag = 0.006,
+ SHELFICEheatTransCoeff=0.00012,
 # SHELFICEsaltTransCoeff = .0008142857,
  SHELFICERemeshFrequency = 600.0,
  SHELFICESplitThreshold =1.2,
@@ -18,9 +18,9 @@
  shelfice_massmin_trueDens = .true.,
  shelfice_conserve_ssh=.true.,
  SHELFICEdepthMinMelt=10.
- SHI_withBL_realFWflux =.false.,
- SHELFICEMassStepping = .false.,
+ SHI_withBL_realFWflux = .true.,
+ SHELFICEMassStepping = .true.,
  SHI_withBL_uStarTopDz = .true.
- SHELFICE_transition_gamma=.false.
- SHELFICETransGammaThickness=0.
+ SHELFICE_transition_gamma=.true.,
+ SHELFICETransGammaThickness=200,
  &

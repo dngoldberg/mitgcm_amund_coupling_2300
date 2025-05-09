@@ -237,13 +237,14 @@ U_southPAS = permute(U_south,[2 1 3]);
 
 
 % need USouth and VSoutn
+% append 10-year cycle to end of series
 PASyears = size(U_south,3)/12;
 U_south = zeros(nx_forcing,length(z),n_months);
 V_south = zeros(nx_forcing,length(z),n_months);
-U_south(:,:,1:(12*PASyears)) = U_southPAS;
-V_south(:,:,1:(12*PASyears)) = V_southPAS;
-U_south(:,:,(12*PASyears+1):end) = repmat(U_southPAS(:,:,(end-11):end),[1 1 length(year_array)-dstart-PASyears]);
-V_south(:,:,(12*PASyears+1):end) = repmat(V_southPAS(:,:,(end-11):end),[1 1 length(year_array)-dstart-PASyears]);
+U_south(:,:,1:(12*PASyears-12)) = U_southPAS(:,:,1:(end-12));
+V_south(:,:,1:(12*PASyears-12)) = V_southPAS(:,:,1:(end-12));
+U_south(:,:,(12*PASyears-11):end) = repmat(U_southPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
+V_south(:,:,(12*PASyears-11):end) = repmat(V_southPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
 
 
 % now, to create S_south and T_south!
@@ -254,11 +255,39 @@ SbotClim = permute(SbotClim,[2 1 3]);
 TbotClim = permute(TbotClim,[2 1 3]);
 
 for i = 1:(length(year_array) - (ystart_in-year_array(1)));
+
+    TbotAnomslice_i = TbotAnomslice(:,:,i+dstart);
+    TbotAnomslice_im1 = TbotAnomslice(:,:,i+dstart-1);
+    SbotAnomslice_i = SbotAnomslice(:,:,i+dstart);
+    SbotAnomslice_im1 = SbotAnomslice(:,:,i+dstart-1);
+
+    if (i==(length(year_array) - (ystart_in-year_array(1))));
+        TbotAnomslice_ip1 = TbotAnomslice(:,:,i+dstart);
+        SbotAnomslice_ip1 = SbotAnomslice(:,:,i+dstart);
+    else
+        TbotAnomslice_ip1 = TbotAnomslice(:,:,i+dstart+1);
+        SbotAnomslice_ip1 = SbotAnomslice(:,:,i+dstart+1);
+    end
+
     for j=1:12;
+
+        if (j<=6);
+           TbotAnom = (12-(6.5-j))/12*TbotAnomslice_i + ...
+                      (6.5-j)/12*TbotAnomslice_im1;
+           SbotAnom = (12-(6.5-j))/12*SbotAnomslice_i + ...
+                      (6.5-j)/12*SbotAnomslice_im1;
+        else
+           TbotAnom = (12-(j-.5))/12*TbotAnomslice_i + ...
+                      ((j-.5))/12*TbotAnomslice_ip1;
+           SbotAnom = (12-(j-.5))/12*SbotAnomslice_i + ...
+                      ((j-.5))/12*SbotAnomslice_ip1;
+        end
+
         S_south(:,:,(i-1)*12+j) = ...
-            SbotClim(:,:,j) + SbotAnomslice(:,:,i+dstart);
+            SbotClim(:,:,j) + SbotAnom;
         T_south(:,:,(i-1)*12+j) = ...
-            TbotClim(:,:,j) + TbotAnomslice(:,:,i+dstart);
+            TbotClim(:,:,j) + TbotAnom;
+
     end
 end
 
@@ -278,16 +307,20 @@ V_Int = zeros(nx+gx,nz,n_months);
 [X,Y] = meshgrid(linspace(1,nx,nx),z); Y=Y';X=X';
 zmid = .5 * (z2(1:end-1)+z2(2:end));
 [X2,Y2] = meshgrid(linspace(1,nx,nx),zmid); Y2=Y2';X2=X2';
-for t=1:n_months;
+
+for t=1:n_months
+    
     S_time = zeros(nx,length(z)); S_time((size(S_south,1)+1):end,:)=nan;
     T_time = zeros(nx,length(z)); T_time((size(S_south,1)+1):end,:)=nan;
     U_time = zeros(nx,length(z)); U_time((size(S_south,1)+1):end,:)=nan;
     V_time = zeros(nx,length(z)); V_time((size(S_south,1)+1):end,:)=nan;
+
     S_time(1:size(S_south,1),:) = smooth_obc(S_south(:,:,t),smoothnum);
     T_time(1:size(S_south,1),:) = smooth_obc(T_south(:,:,t),smoothnum);
     U_time(1:size(S_south,1),:) = smooth_obc(U_south(:,:,t),smoothnum);
     V_time(1:size(S_south,1),:) = smooth_obc(V_south(:,:,t),smoothnum);
     ibad = isnan(S_time);
+    
     S_interp = griddata(X(~ibad), Y(~ibad), S_time(~ibad), X2, Y2, 'nearest'); S_interp(isnan(S_interp))=-9999;
     S_Int(1:nx,:,t) = S_interp;
     T_interp = griddata(X(~ibad), Y(~ibad), T_time(~ibad), X2, Y2, 'nearest'); T_interp(isnan(T_interp))=-9999;
@@ -357,14 +390,15 @@ V_westPAS = permute(V_west,[2 1 3]);
 U_westPAS = permute(U_west,[2 1 3]);
 
 
-% need USouth and VSoutn
+% need U and V
+% append 10-year cycle to end of series
 PASyears = size(U_west,3)/12;
 U_west = zeros(ny_forcing,length(z),n_months);
 V_west = zeros(ny_forcing,length(z),n_months);
-U_west(:,:,1:(12*PASyears)) = U_westPAS;
-V_west(:,:,1:(12*PASyears)) = V_westPAS;
-U_west(:,:,(12*PASyears+1):end) = repmat(U_westPAS(:,:,(end-11):end),[1 1 length(year_array)-dstart-PASyears]);
-V_west(:,:,(12*PASyears+1):end) = repmat(V_westPAS(:,:,(end-11):end),[1 1 length(year_array)-dstart-PASyears]);
+U_west(:,:,1:(12*PASyears-12)) = U_westPAS(:,:,1:(end-12));
+V_west(:,:,1:(12*PASyears-12)) = V_westPAS(:,:,1:(end-12));
+U_west(:,:,(12*PASyears-11):end) = repmat(U_westPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
+V_west(:,:,(12*PASyears-11):end) = repmat(V_westPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
 
 % now, to create S_south and T_south!
 S_west = zeros(ny_forcing,length(z),n_months);
@@ -374,11 +408,39 @@ SleftClim = permute(SleftClim,[2 1 3]);
 TleftClim = permute(TleftClim,[2 1 3]);
 
 for i = 1:(length(year_array) - (ystart_in-year_array(1)));
+
+    TleftAnomslice_i = TleftAnomslice(:,:,i+dstart);
+    TleftAnomslice_im1 = TleftAnomslice(:,:,i+dstart-1);
+    SleftAnomslice_i = SleftAnomslice(:,:,i+dstart);
+    SleftAnomslice_im1 = SleftAnomslice(:,:,i+dstart-1);
+
+    if (i==(length(year_array) - (ystart_in-year_array(1))));
+        TleftAnomslice_ip1 = TleftAnomslice(:,:,i+dstart);
+        SleftAnomslice_ip1 = SleftAnomslice(:,:,i+dstart);
+    else
+        TleftAnomslice_ip1 = TleftAnomslice(:,:,i+dstart+1);
+        SleftAnomslice_ip1 = SleftAnomslice(:,:,i+dstart+1);
+    end
+
     for j=1:12;
+
+        if (j<=6);
+           TleftAnom = (12-(6.5-j))/12*TleftAnomslice_i + ...
+                      (6.5-j)/12*TleftAnomslice_im1;
+           SleftAnom = (12-(6.5-j))/12*SleftAnomslice_i + ...
+                      (6.5-j)/12*SleftAnomslice_im1;
+        else
+           TleftAnom = (12-(j-.5))/12*TleftAnomslice_i + ...
+                      ((j-.5))/12*TleftAnomslice_ip1;
+           SleftAnom = (12-(j-.5))/12*SleftAnomslice_i + ...
+                      ((j-.5))/12*SleftAnomslice_ip1;
+        end
+
         S_west(:,:,(i-1)*12+j) = ...
-            SleftClim(:,:,j) + SleftAnomslice(:,:,i+dstart);
+            SleftClim(:,:,j) + SleftAnom;
         T_west(:,:,(i-1)*12+j) = ...
-            TleftClim(:,:,j) + TleftAnomslice(:,:,i+dstart);
+            TleftClim(:,:,j) + TleftAnom;
+
     end
 end
 
@@ -397,10 +459,10 @@ for t=1:n_months
     U_time = zeros(ny,length(z)); U_time((size(S_west,1)+1):end,:)=nan;
     V_time = zeros(ny,length(z)); V_time((size(S_west,1)+1):end,:)=nan;
     
-    S_time = smooth_obc(S_west(:,:,t),smoothnum);
-    T_time = smooth_obc(T_west(:,:,t),smoothnum);
-    U_time = smooth_obc(U_west(:,:,t),smoothnum);
-    V_time = smooth_obc(V_west(:,:,t),smoothnum);
+    S_time(1:size(S_west,1),:) = smooth_obc(S_west(:,:,t),smoothnum);
+    T_time(1:size(S_west,1),:) = smooth_obc(T_west(:,:,t),smoothnum);
+    U_time(1:size(S_west,1),:) = smooth_obc(U_west(:,:,t),smoothnum);
+    V_time(1:size(S_west,1),:) = smooth_obc(V_west(:,:,t),smoothnum);
     ibad = isnan(S_time);
     S_interp = griddata(X(~ibad), Y(~ibad), S_time(~ibad), X2, Y2, 'nearest'); S_interp(isnan(S_interp))=-9999;
     S_Int(1:ny,:,t) = S_interp;

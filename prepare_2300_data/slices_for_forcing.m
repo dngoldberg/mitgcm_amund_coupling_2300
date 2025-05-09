@@ -89,10 +89,17 @@ for i=1:length(years);
     salt(~mask)=nan;
     theta(~mask)=nan;
 
-    SleftAnomslice(:,:,i) = squeeze(griddata(X(mask),Y(mask),Z(mask),salt(mask),xleft,yleft,zleft,'nearest')) - (i>1)*SleftAnomslice(:,:,1);
-    TleftAnomslice(:,:,i) = squeeze(griddata(X(mask),Y(mask),Z(mask),theta(mask),xleft,yleft,zleft,'nearest')) - (i>1)*TleftAnomslice(:,:,1);
-    SbotAnomslice(:,:,i) = squeeze(griddata(X(mask),Y(mask),Z(mask),salt(mask),xbot,ybot,zbot,'nearest')) - (i>1)*SbotAnomslice(:,:,1);
-    TbotAnomslice(:,:,i) = squeeze(griddata(X(mask),Y(mask),Z(mask),theta(mask),xbot,ybot,zbot,'nearest')) - (i>1)*TbotAnomslice(:,:,1);
+    SleftAnomslice(:,:,i) = squeeze(griddata(X(mask),Y(mask),Z(mask),salt(mask),xleft,yleft,zleft,'nearest'));
+    TleftAnomslice(:,:,i) = squeeze(griddata(X(mask),Y(mask),Z(mask),theta(mask),xleft,yleft,zleft,'nearest'));
+    SbotAnomslice(:,:,i) = squeeze(griddata(X(mask),Y(mask),Z(mask),salt(mask),xbot,ybot,zbot,'nearest'));
+    TbotAnomslice(:,:,i) = squeeze(griddata(X(mask),Y(mask),Z(mask),theta(mask),xbot,ybot,zbot,'nearest'));
+
+    %SleftAnomslice(:,:,i) = fillmissing2(SleftAnomslice(:,:,i),'nearest')-(i>1)*SleftAnomslice(:,:,1);
+    %TleftAnomslice(:,:,i) = fillmissing2(TleftAnomslice(:,:,i),'nearest')-(i>1)*TleftAnomslice(:,:,1);
+    %SbotAnomslice(:,:,i) = fillmissing2(SbotAnomslice(:,:,i),'nearest')-(i>1)*SbotAnomslice(:,:,1);
+    %TbotAnomslice(:,:,i) = fillmissing2(TbotAnomslice(:,:,i),'nearest')-(i>1)*TbotAnomslice(:,:,1);
+
+
 
     %salt_slice_left = interp3(X,Y,Z,salt,xleft,yleft,zleft);
     %theta_slice_left = interp3(X,Y,Z,theta,xleft,yleft,zleft);
@@ -101,11 +108,26 @@ for i=1:length(years);
     
 end
 
+for i=2:size(SleftAnomslice,3);
+
+SleftAnomslice(:,:,i) = SleftAnomslice(:,:,i) - SleftAnomslice(:,:,1);
+TleftAnomslice(:,:,i) = TleftAnomslice(:,:,i) - TleftAnomslice(:,:,1);
+SbotAnomslice(:,:,i) = SbotAnomslice(:,:,i) - SbotAnomslice(:,:,1);
+TbotAnomslice(:,:,i) = TbotAnomslice(:,:,i) - TbotAnomslice(:,:,1);
+
+end
 
 SleftAnomslice(:,:,1) = 0;
 TleftAnomslice(:,:,1) = 0; 
 SbotAnomslice(:,:,1) = 0;
 TbotAnomslice(:,:,1) = 0;
 
+SleftAnomslice(isnan(SleftAnomslice)) = 0;
+TleftAnomslice(isnan(TleftAnomslice)) = 0;
+SbotAnomslice(isnan(SbotAnomslice)) = 0;
+TbotAnomslice(isnan(TbotAnomslice)) = 0;
 
-save slices_anom_forcing.mat years SleftAnomslice TleftAnomslice  SbotAnomslice TbotAnomslice
+year_array = years;
+
+
+save slices_anom_forcing.mat year_array SleftAnomslice TleftAnomslice  SbotAnomslice TbotAnomslice
