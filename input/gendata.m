@@ -220,8 +220,10 @@ bathy(bathy0>-20) = 0;
 bathy(1,294:end)=0;
 bathy(80:end,1)=0;
 
+disp(num2str(nx))
+disp(num2str(ny))
 replace_param(obcsdatafile,'ob_jsouth',[num2str(79) '*1 ' num2str(nx-79) '*0,'],false)
-replace_param(obcsdatafile,'ob_jwest',[num2str(293) '*1 ' num2str(ny-293) '*0,'],false)
+replace_param(obcsdatafile,'ob_iwest',[num2str(293) '*1 ' num2str(ny-293) '*0,'],false)
 
 bathy(end,:) = 0;
 bathy(:,end) = 0;

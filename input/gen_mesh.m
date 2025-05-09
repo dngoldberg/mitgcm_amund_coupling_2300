@@ -43,22 +43,18 @@ Yuniform = unif_bounds(3):1e3:unif_bounds(4);
 
 [Xuniform Yuniform] = meshgrid(Xuniform,Yuniform);
 
-%[vxout vyout]= interpMouginotAnt2017(Xuniform,Yuniform,1);
-%mask = interpBedmachineAntarctica(Xuniform,Yuniform,'mask');
- 
- 
 
 npx_oce = 16;
-npy_oce = 32;
+npy_oce = 16;
 
 npx_ice = 8;
 npy_ice = 16;
 
-oce_extent_y_init = [-7.12e5 0e5];
+oce_extent_y_init = [-7.12e5 -2e5];
 ny_init = diff(oce_extent_y_init) / npy_oce / dy0;
 nyoce = ceil(ny_init) * npy_oce;
 
-oce_extent_x_init = [-1.7e6 -1.2e6];
+oce_extent_x_init = [-1.7e6 -1.4e6];
 nx_init = diff(oce_extent_x_init) / npx_oce / dx0;
 nxoce = ceil(nx_init) * npx_oce;
 
@@ -74,14 +70,8 @@ dx_var = dx0 + res_slope * (1:400);
 y_var = cumsum(dy_var);
 x_var = cumsum(dx_var);
 
-
-
 x_mesh = [(x_mesh_oce(1)-fliplr(x_var)) x_mesh_oce (x_mesh_oce(end)+x_var)];
 y_mesh = [(y_mesh_oce(1)-fliplr(y_var)) y_mesh_oce (y_mesh_oce(end)+y_var)];
-
-%x_mesh_oce = [x_mesh_oce (x_mesh_oce(end)+x_var(1:(2*npx_oce)))];
-x_mesh_oce_mid = .5 * (x_mesh_oce(1:end-1)+x_mesh_oce(2:end));
-nxoce = length(x_mesh_oce_mid);
 
 k = max(find(y_mesh<unif_bounds(3)));
 k2 = min(find(y_mesh>unif_bounds(4)));
@@ -93,8 +83,48 @@ l2 = min(find(x_mesh>unif_bounds(2)));
 l2 = l + npx_ice * ceil((l2-l)/npx_ice);
 x_mesh = x_mesh(l:l2);
 
+% now do new ocean grid
+
+oce_extent_y_init = [-7.12e5 -1.35e5];
+oce_extent_x_init = [-1.7e6 -1.3e6];
+
+% revert to old
+%oce_extent_y_init = [-7.12e5 0e5];
+%oce_extent_x_init = [-1.7e6 -1.2e6];
+
+npx_oce = 16;
+npy_oce = 24;
+
+k2_oce = min(find(y_mesh>oce_extent_y_init(2)))
+l2_oce = min(find(x_mesh>oce_extent_x_init(2)));
+
+ind2x = find(x_mesh==x_mesh_oce(end));
+ind2y = find(y_mesh==y_mesh_oce(end))
+y_mesh(k2_oce)
+
+
+x_mesh_oce = [x_mesh_oce x_mesh((ind2x+1):l2_oce)];
+y_mesh_oce = [y_mesh_oce y_mesh((ind2y+1):k2_oce)];
+
+y_mesh_oce(end)
+
+nxoce = length(x_mesh_oce)-1;
+nyoce = length(y_mesh_oce)-1
+
+nxoce = floor(nxoce/npx_oce)*npx_oce;
+nyoce = floor(nyoce/npy_oce)*npy_oce
+
+x_mesh_oce = x_mesh_oce(1:(nxoce+1));
+y_mesh_oce = y_mesh_oce(1:(nyoce+1));
+
+
 x_mesh_mid = .5 * (x_mesh(1:end-1)+x_mesh(2:end));
 y_mesh_mid = .5 * (y_mesh(1:end-1)+y_mesh(2:end));
+x_mesh_oce_mid = .5 * (x_mesh_oce(1:end-1)+x_mesh_oce(2:end));
+y_mesh_oce_mid = .5 * (y_mesh_oce(1:end-1)+y_mesh_oce(2:end));
+
+
+
 nxice = length(x_mesh_mid);
 nyice = length(y_mesh_mid);
 
@@ -117,18 +147,26 @@ ind2y = find(y_mesh_mid==y_mesh_oce_mid(end));
 
 
 
-length(x_mesh_oce_mid)/npx_oce
-length(y_mesh_oce_mid)/npy_oce
+
+nxoce = length(x_mesh_oce_mid);
+nyoce = length(y_mesh_oce_mid);
+
+nx_grid = ceil(nxoce/npx_oce)
+ny_grid = ceil(nyoce/npy_oce)
+
+gx = npx_oce*nx_grid-nxoce;
+gy = npy_oce*ny_grid-nyoce;
+
 length(x_mesh_mid)/npx_ice
 length(y_mesh_mid)/npy_ice
 
 [xoce yoce] = meshgrid(x_mesh_oce_mid,y_mesh_oce_mid);
 
-
 internal_grid_x = ind1x:ind2x;
 internal_grid_y = ind1y:ind2y;
 
 zMod = -12.5:-25:-2425;
+length(zMod)
 
 save([sub_dir '/meshcoords.mat'],'x_mesh_mid', 'y_mesh_mid', 'x_mesh_oce_mid', 'y_mesh_oce_mid', ...
     'internal_grid_x','internal_grid_y','diffx','diffy','zMod');
@@ -146,6 +184,7 @@ calc_bounds = true;
 if (length(dir([sub_dir '/bdryDatapaholPy' num2str(PAS) '.mat']))==1);
     calc_bounds = false;
 end
+
 
 
 
@@ -200,38 +239,12 @@ eval(['!ln -s /home/dgoldber/network_links/geosIceOcean/dgoldber/pahol_output/na
 eval(['!ln -s /exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/prepare_2300_data/naughtenClim.mat ' sub_dir '/naughtenClim.mat']);
 eval(['!ln -s /exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/amund_couple/mitgcm_amund_coupling_2300/prepare_2300_data/slices_anom_forcing.mat ' sub_dir '/slices_anom_forcing.mat']);
 
- 
-%else
-% 
-% save zmod.mat zMod
-% if (calc_bounds);
-%  calc_bounds_t = 'True';
-% else
-%  calc_bounds_t = 'False';
-% end
-% 
-% if (calc_init);
-%  calc_init_t = 'True';
-% else
-%  calc_init_t = 'False';
-% end
-% 
-% 
-% str=(['!python ../python_scripts/readOcedataRegional.py ' num2str(PAS) ' ' ...
-%        num2str(ystart) ' ' ...
-%        num2str(yend) ' ' ...
-%        sub_dir ' ' ...
-%        calc_bounds_t ' ' ...
-%        calc_init_t]);
-% str
-% eval(str)
-%end
 
 if (bc_setup)
-rdmds_init(PAS,nxoce,nyoce,zMod,0,0,2,ystart,yend);
+rdmds_init(PAS,nxoce,nyoce,zMod,gx,gy,2,ystart,yend);
 end
 if (oce_setup)
-gendata(PAS,nxoce,nyoce,zMod,0,0,2,1030,ystart,dig_depth,gamma_depth,gammaT,cd);
+gendata(PAS,nxoce,nyoce,zMod,gx,gy,2,1030,ystart,dig_depth,gamma_depth,gammaT,cd);
 end
 
 

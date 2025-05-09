@@ -2,8 +2,8 @@
 # | Parameters for STREAMICE package |
 # ===================================
  &STREAMICE_PARM01
-# streamice_maxnliter_cpl = 1,
-# streamice_maxcgiter_cpl = 20000,
+ streamice_maxnliter_cpl = 1,
+ streamice_maxcgiter_cpl = 20000,
  STREAMICE_allow_cpl=.TRUE.,
 # streamice_vel_update = 43200,
 #############################
@@ -48,7 +48,7 @@
  STREAMICEHBCyFile = 'HBCy_oce.bin',
  STREAMICEHBCxFile = 'HBCx_oce.bin',
  STREAMICE_vel_ext = .true.,
- STREAMICE_diagnostic_only=.true.,
+ STREAMICE_diagnostic_only=.false.,
  &
 
  &STREAMICE_PARM02

@@ -25,7 +25,7 @@ else
 end
 
 create_inputs_snap = false;
-create_inputs_couplesnap = false;
+create_inputs_couplesnap = true;
 create_inputs_coupletc = false;
 
 if (use_2004)
@@ -52,9 +52,9 @@ else
  oce_outdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE_2300/OCE_SPINUP/run_2009_' num2str(PAS) '_' ...
      num2str(gamma_depth) '_' strrep(num2str(cd),'0.','.') '_' strrep(num2str(gammaT),'0.','.') '_' num2str(dig_depth)]
  if (weert)
-     ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE_2300/ICE_INIT/run_ad_2009_weert']
+     ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT/run_ad_2009_weert']
  else
-     ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE_2300/ICE_INIT/run_ad_2009_coul']
+     ice_optimdir = ['/home/dgoldber/network_links/geosIceOcean/dgoldber/archer_output/AMUND_COUPLE/ICE_INIT/run_ad_2009_coul']
  end
  optimnumber = 200;
  s = dir([ice_optimdir '/runoptiter*'])
@@ -387,6 +387,9 @@ end
 %betaS(grd==0)=80;
 
 if (create_inputs_couplesnap);
+disp('got here couplesnap')
+disp(ice_optimdir)
+disp([ice_optimdir '/runoptiter' appNum(optimnumbercouplesnap,3) '/C_basal_fric'])
 beta0 = rdmds([ice_optimdir '/runoptiter' appNum(optimnumbercouplesnap,3) '/C_basal_fric']);
 betap = rdmds([ice_optimdir '/runoptiter' appNum(optimnumbercouplesnap,3) '/xx_genarr2d2']);
 Bglen0 = rdmds([ice_optimdir '/runoptiter' appNum(optimnumbercouplesnap,3) '/B_glen_sqrt']);
