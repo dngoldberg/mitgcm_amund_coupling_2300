@@ -54,7 +54,9 @@
 
 #   fields(1:2,2) = 'UVELMASS','VVELMASS'
 #   filename(2) = 'dynDiag',
-#  frequency(2) =  2592000.,
+#  frequency(2) =  2592000.,a
+  diag_pickup_read=.TRUE.
+  diag_pickup_write=.TRUE.
  &
  &DIAG_STATIS_PARMS
  &
