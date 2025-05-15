@@ -91,6 +91,10 @@ fi
 
 coupled_step_time=864000
 pickup_save_time=31104000
+oce3d_save_steps=311040
+oce2d_save_steps=25920
+ice2d_save_steps=3
+
 if [[ $3 == 0 ]]; then
  ncoupled_steps_max=480
  save_steps=60
@@ -275,7 +279,20 @@ if [[ $3 == 0 ]]; then
  sed "s/.*Cal.*/$newpkg/" data.pkg > data.pkg.temp; mv data.pkg.temp data.pkg
  rm data.diagnostics
  ln -s $input_oce_dir/data.diagnostics.no_oce data.diagnostics
+
 fi
+
+## now - set averaging time to coupled timestep -- will average to 1 yr later on
+noce_steps=$(($coupled_step_time/$timestep))
+
+strDiag='  frequency(1) = ${noce_steps}.,'
+sed "s/.*frequency(1).*/$strDiag" data.diagnostics > data.diagnostics.temp; 
+mv data.diagnostics.temp data.diagnostics
+
+strDiag='  frequency(2) = ${noce_steps}.,'
+sed "s/.*frequency(2).*/$strDiag" data.diagnostics > data.diagnostics.temp; 
+mv data.diagnostics.temp data.diagnostics
+####
 
 if [[ $niter_oce == $ocePickupStep ]]; 
 then
@@ -365,7 +382,7 @@ newdata=" shiCdrag = $cfric,"
 sed "s/.*shiCdrag.*/$newdata/" data.shelfice > data.temp; mv data.temp data.shelfice
 
 
-###
+################
 
 cd $SLURM_SUBMIT_DIR/../$run_ice
 ln -s $input_ice_dir/* .
@@ -438,6 +455,14 @@ else
  str=" streamice_allow_reg_coulomb = .true.,"
 fi
 sed "s/.*allow_reg_coulomb.*/$str/" data.streamice > data.streamice.temp; mv data.streamice.temp data.streamice
+
+## now - set averaging time to coupled timestep -- will average to 1 month later on
+nice_steps=1
+
+strDiag='  frequency(1) = ${nice_steps}.,'
+sed "s/.*frequency(1).*/$strDiag" data.diagnostics > data.diagnostics.temp;
+mv data.diagnostics.temp data.diagnostics
+####
 
 #exit 0
 
@@ -650,6 +675,42 @@ if (( $mod_save_time == 0 )); then
 fi
 cd $OLDPWD
 
+
+#oce3d_save_steps=311040
+#oce2d_save_steps=25920
+#ice2d_save_steps=25920
+
+
+cd $SLURM_SUBMIT_DIR/../$run_oce
+test_average_time=$(($niter_oce))
+mod_average_time=$(($test_average_time%$oce3d_save_steps))
+echo "oce3d mod_average_time: " $mod_average_time
+if (( $mod_average_time == 0 )); then
+	ln -s ../../python_scripts/average_timesteps.py .
+	# name, coupling_period, averaging_period, final_time, dt)
+	python average_timesteps.py dynDiag ${noce_steps} ${oce3d_save_steps} ${niter_oce} $timestep
+	mv dynDiag* diags
+fi
+
+test_average_time=$(($niter_oce))
+mod_average_time=$(($test_average_time%$oce2d_save_steps))
+echo "oce2d mod_average_time: " $mod_average_time
+if (( $mod_average_time == 0 )); then
+        ln -s ../../python_scripts/average_timesteps.py .
+        # name, coupling_period, averaging_period, final_time, dt)
+        python average_timesteps.py surfDiag ${noce_steps} ${oce2d_save_steps} ${niter_oce} $timestep
+	mv surfDiag* diags
+fi
+
+test_average_time=$(($niter_ice))
+mod_average_time=$(($test_average_time%$ice2d_save_steps))
+echo "ice2d mod_average_time: " $mod_average_time
+if (( $mod_average_time == 0 )); then
+        ln -s ../../python_scripts/average_timesteps.py .
+        # name, coupling_period, averaging_period, final_time, dt)
+        python average_timesteps.py land_ice 1 ${ice2d_save_steps} ${niter_ice} ${noce_steps}
+	mv land_ice* diags
+fi
 done # end coupled loop
 
 

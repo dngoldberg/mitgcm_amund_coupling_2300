@@ -24,9 +24,9 @@ transfer_folder=transfer_files_$1_$2_$3_$4_$5
 
 cd $SLURM_SUBMIT_DIR/..
 
-Lsurfdiag=$(ls $oce_run_folder/surfDiag*)
-Ldyndiag=$(ls $oce_run_folder/dynDiag*)
-Icediag=$(ls $ice_run_folder/land_ice*)
+Lsurfdiag=$(ls $oce_run_folder/diags/surfDiag*)
+Ldyndiag=$(ls $oce_run_folder/diags/dynDiag*)
+Icediag=$(ls $ice_run_folder/diags/land_ice*)
 Ocestate=$(ls $oce_run_folder/W.* $oce_run_folder/U.* $oce_run_folder/V.* $oce_run_folder/Eta.* $oce_run_folder/T.* $oce_run_folder/S.*)
 Lstdoutice=$(ls $ice_stdout_folder/std*)
 Lstdoutoce=$(ls $oce_stdout_folder/std*)

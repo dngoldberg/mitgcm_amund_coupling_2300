@@ -4,6 +4,7 @@ if [ -d "../run_ice_$1_$2_$3_$4_$5" ]; then
 else
   echo 'There is no ice run directory'
   mkdir ../run_ice_$1_$2_$3_$4_$5
+  mkdir ../run_ice_$1_$2_$3_$4_$5/diags
 fi
 
 if [ -d "../run_oce_$1_$2_$3_$4_$5" ]; then
@@ -13,6 +14,7 @@ else
   echo 'There is no oce run directory'
   mkdir ../run_oce_$1_$2_$3_$4_$5
   cd ../run_oce_$1_$2_$3_$4_$5
+  mkdir diags
 fi
 cp -f ../../input/start_$1_input/oce/pickup* ./
 
