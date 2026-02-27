@@ -129,6 +129,8 @@ if [ $3 != G ]; then
         sed "s/.*SHELFICEheatTransCoeff.*/$newdata/" data.shelfice > data.temp; mv data.temp data.shelfice
 fi
 
+rm data.diagnostics
+ln -s $input_oce_dir/data.diagnostics.oce_spinup data.diagnostics
 
 
 # Deep copy of any pickups (so they don't get overwritten in input/)

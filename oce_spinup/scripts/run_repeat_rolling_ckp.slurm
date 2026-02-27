@@ -32,7 +32,7 @@ source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
 
 timestep=100
 #tottime=93312000
-tottime=373249000
+#tottime=373249000
 #tottime=339552000
 tottime=155521000
 maxntime=466760
