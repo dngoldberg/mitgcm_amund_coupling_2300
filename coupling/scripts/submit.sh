@@ -124,6 +124,7 @@ if [ $r_flag == true ]; then
   echo "restarting."
 else
   echo "The -r flag is not set. deleting files"
+  echo $y_value $cal_value $PAS_value $parmn coul
   bash prepare_run.sh $y_value $cal_value $PAS_value $parmn coul
 fi
 

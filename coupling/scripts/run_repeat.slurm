@@ -14,6 +14,8 @@ module load PrgEnv-cray
 module load cray-hdf5-parallel
 module load cray-netcdf-hdf5parallel
 
+#$1 $5 $invname $iterTC $4 $2
+#yr PAS name iter coul tc
 
 #$y_value 
 #$cal_value 
@@ -100,7 +102,7 @@ if [[ $3 == 0 ]]; then
  save_steps=60
 else
  ncoupled_steps_max=36
- save_steps=18
+ save_steps=37
 fi
 rollingChkptTime=$coupled_step_time
 ocePickupStep=$(( 5 * 311040 ))
@@ -110,7 +112,7 @@ echo "ocePickupStep: " $ocePickupStepPad
 
 input_oce_dir=../../input/start_$1_input/oce
 input_ice_dir=../../input/start_$1_input/ice/
-pickup_oce_dir=../../oce_spinup/run_${1}_${3}_${Gtrans}_${cfric}_${shitrans}_80
+pickup_oce_dir=../../oce_spinup/run_${1}_80_${Gtrans}_${cfric}_${shitrans}_80
 
 echo "PICKUP OCE DIR: " $pickup_oce_dir
 
@@ -242,7 +244,7 @@ ln -s $input_oce_dir/* .
 rm data
 cp -f $input_oce_dir/data .
 
-if [[ $3 == 10 ]]; then
+if [[ $3 == 10 || $3 == 40 ]]; then
  newexf=" repeatPeriod      = 31104000.0,"
  sed "s/.*repeatPeriod.*/$newexf/" data.exf > data.temp.exf; mv data.temp.exf data.exf
  newexf="#useOBCSYearlyFields"
@@ -285,13 +287,17 @@ fi
 ## now - set averaging time to coupled timestep -- will average to 1 yr later on
 noce_steps=$(($coupled_step_time/$timestep))
 
-strDiag='  frequency(1) = ${noce_steps}.,'
-sed "s/.*frequency(1).*/$strDiag" data.diagnostics > data.diagnostics.temp; 
-mv data.diagnostics.temp data.diagnostics
+strDiag="  frequency(1) = ${coupled_step_time}.,"
+sed "s/.*frequency(1).*/$strDiag/" data.diagnostics > data.diagnostics.temp; 
+strDiag="  frequency(2) = ${coupled_step_time}.,"
+sed "s/.*frequency(2).*/$strDiag/" data.diagnostics.temp > data.diagnostics.temp2; 
 
-strDiag='  frequency(2) = ${noce_steps}.,'
-sed "s/.*frequency(2).*/$strDiag" data.diagnostics > data.diagnostics.temp; 
-mv data.diagnostics.temp data.diagnostics
+strDiag="  frequency(3) = -${coupled_step_time}.,"
+sed "s/.*frequency(3).*/$strDiag/" data.diagnostics.temp2 > data.diagnostics.temp3; 
+strDiag="  frequency(4) = -${coupled_step_time}.,"
+sed "s/.*frequency(4).*/$strDiag/" data.diagnostics.temp3 > data.diagnostics.temp4; 
+
+cp data.diagnostics.temp4 data.diagnostics
 ####
 
 if [[ $niter_oce == $ocePickupStep ]]; 
@@ -459,9 +465,11 @@ sed "s/.*allow_reg_coulomb.*/$str/" data.streamice > data.streamice.temp; mv dat
 ## now - set averaging time to coupled timestep -- will average to 1 month later on
 nice_steps=1
 
-strDiag='  frequency(1) = ${nice_steps}.,'
-sed "s/.*frequency(1).*/$strDiag" data.diagnostics > data.diagnostics.temp;
-mv data.diagnostics.temp data.diagnostics
+strDiag="  frequency(1) = ${coupled_step_time}.,"
+sed "s/.*frequency(1).*/$strDiag/" data.diagnostics > data.diagnostics.temp;
+strDiag="  frequency(2) = -${coupled_step_time}.,"
+sed "s/.*frequency(2).*/$strDiag/" data.diagnostics.temp > data.diagnostics.temp2;
+cp data.diagnostics.temp2 data.diagnostics
 ####
 
 #exit 0
@@ -638,32 +646,47 @@ for (( coupled_step=1; coupled_step<=$ncoupled_steps; coupled_step++ )); do
     
     niter_oce=$((niter_oce+$noce_steps))
 
+    if (( $niter_ice == 1 )); then
+     for exten in data meta; do
+      niteroce0pad=$(pad_with_zeros $niter_oce0 10)
+      mv $SLURM_SUBMIT_DIR/../$run_ice/land_iceInst.0000000000.$exten $SLURM_SUBMIT_DIR/../$run_ice/diags/land_ice.0000000000.$exten
+      mv $SLURM_SUBMIT_DIR/../$run_oce/surfDiagInst.${niteroce0pad}.$exten $SLURM_SUBMIT_DIR/../$run_oce/diags/surfDiag.${niteroce0pad}.$exten
+      mv $SLURM_SUBMIT_DIR/../$run_oce/dynDiagInst.${niteroce0pad}.$exten  $SLURM_SUBMIT_DIR/../$run_oce/diags/dynDiag.${niteroce0pad}.$exten
+     done
+    else
+     rm $SLURM_SUBMIT_DIR/../$run_ice/land_iceInst.*
+     rm $SLURM_SUBMIT_DIR/../$run_oce/dynDiagInst.*
+     rm $SLURM_SUBMIT_DIR/../$run_oce/surfDiagInst.*
+    fi
+
+
+
     if [ $(($coupled_step % $save_steps)) -eq 0 ]; then
      cd ../scripts
      sbatch --job-name=DOWNLOAD -A $Acc rput_couple_mds.slurm $1 $2 $3 $invname $4
      cd $OLDPWD
     fi
 
-cd $SLURM_SUBMIT_DIR/../$run_ice
-test_save_time=$(($niter_ice*$coupled_step_time))
-mod_save_time=$(($test_save_time%$pickup_save_time))
-pickupString=$(printf "%010d" $niter_ice)
-echo "mod_save_time: " $mod_save_time
-if (( $mod_save_time == 0 )); then
+    cd $SLURM_SUBMIT_DIR/../$run_ice
+    test_save_time=$(($niter_ice*$coupled_step_time))
+    mod_save_time=$(($test_save_time%$pickup_save_time))
+    pickupString=$(printf "%010d" $niter_ice)
+    echo "mod_save_time: " $mod_save_time
+    if (( $mod_save_time == 0 )); then
             echo "Saving ice pickup $niter_ice"
 	    for suff in data meta; do
              cp pickup.ckptA.$suff pickups/pickup.$pickupString.$suff -v
              cp pickup_streamice.ckptA.$suff pickups/pickup_streamice.$pickupString.$suff -v
 	    done
-fi
-cd $OLDPWD
+    fi
+    cd $OLDPWD
 
-cd $SLURM_SUBMIT_DIR/../$run_oce
-test_save_time=$(($niter_oce*$timestep))
-mod_save_time=$(($test_save_time%$pickup_save_time))
-pickupString=$(printf "%010d" $niter_oce)
-echo "mod_save_time: " $mod_save_time
-if (( $mod_save_time == 0 )); then
+    cd $SLURM_SUBMIT_DIR/../$run_oce
+    test_save_time=$(($niter_oce*$timestep))
+    mod_save_time=$(($test_save_time%$pickup_save_time))
+    pickupString=$(printf "%010d" $niter_oce)
+    echo "mod_save_time: " $mod_save_time
+    if (( $mod_save_time == 0 )); then
             echo "Saving oce pickup $niter_oce"
 	    for suff in data meta; do
              cp pickup.ckptA.$suff pickups/pickup.$pickupString.$suff -v
@@ -672,48 +695,43 @@ if (( $mod_save_time == 0 )); then
               cp pickup_shelfice.ckptA.$suff pickups/pickup_shelfice.$pickupString.$suff -v
 	     fi
 	    done
-fi
-cd $OLDPWD
+    fi
+    cd $OLDPWD
 
-
-#oce3d_save_steps=311040
-#oce2d_save_steps=25920
-#ice2d_save_steps=25920
-
-
-cd $SLURM_SUBMIT_DIR/../$run_oce
-test_average_time=$(($niter_oce))
-mod_average_time=$(($test_average_time%$oce3d_save_steps))
-echo "oce3d mod_average_time: " $mod_average_time
-if (( $mod_average_time == 0 )); then
+    cd $SLURM_SUBMIT_DIR/../$run_oce
+    test_average_time=$(($niter_oce))
+    mod_average_time=$(($test_average_time%$oce3d_save_steps))
+    echo "oce3d mod_average_time: " $mod_average_time
+    if (( $mod_average_time == 0 )); then
 	ln -s ../../python_scripts/average_timesteps.py .
 	# name, coupling_period, averaging_period, final_time, dt)
 	python average_timesteps.py dynDiag ${noce_steps} ${oce3d_save_steps} ${niter_oce} $timestep
 	mv dynDiag* diags
-fi
+    fi
 
-test_average_time=$(($niter_oce))
-mod_average_time=$(($test_average_time%$oce2d_save_steps))
-echo "oce2d mod_average_time: " $mod_average_time
-if (( $mod_average_time == 0 )); then
+    test_average_time=$(($niter_oce))
+    mod_average_time=$(($test_average_time%$oce2d_save_steps))
+    echo "oce2d mod_average_time: " $mod_average_time
+    if (( $mod_average_time == 0 )); then
         ln -s ../../python_scripts/average_timesteps.py .
         # name, coupling_period, averaging_period, final_time, dt)
         python average_timesteps.py surfDiag ${noce_steps} ${oce2d_save_steps} ${niter_oce} $timestep
 	mv surfDiag* diags
-fi
+    fi
 
-test_average_time=$(($niter_ice))
-mod_average_time=$(($test_average_time%$ice2d_save_steps))
-echo "ice2d mod_average_time: " $mod_average_time
-if (( $mod_average_time == 0 )); then
+    cd $SLURM_SUBMIT_DIR/../$run_ice
+    test_average_time=$(($niter_ice))
+    mod_average_time=$(($test_average_time%$ice2d_save_steps))
+    echo "ice2d mod_average_time: " $mod_average_time
+    if (( $mod_average_time == 0 )); then
         ln -s ../../python_scripts/average_timesteps.py .
         # name, coupling_period, averaging_period, final_time, dt)
-        python average_timesteps.py land_ice 1 ${ice2d_save_steps} ${niter_ice} ${noce_steps}
-	mv land_ice* diags
-fi
+        python average_timesteps.py land_ice 1 ${ice2d_save_steps} ${niter_ice} ${coupled_step_time}
+ 	mv land_ice* diags
+    fi
 done # end coupled loop
 
-
+#################################################
 
 cd $SLURM_SUBMIT_DIR/../$run_ice
 s=$(grep timeStepNumber pickup_streamice.ckptA.meta)

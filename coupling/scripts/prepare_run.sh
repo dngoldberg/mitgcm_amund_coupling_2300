@@ -1,6 +1,7 @@
 if [ -d "../run_ice_$1_$2_$3_$4_$5" ]; then
   cd ../run_ice_$1_$2_$3_$4_$5
   rm -rfv *
+  mkdir diags
 else
   echo 'There is no ice run directory'
   mkdir ../run_ice_$1_$2_$3_$4_$5
@@ -10,6 +11,7 @@ fi
 if [ -d "../run_oce_$1_$2_$3_$4_$5" ]; then
   cd ../run_oce_$1_$2_$3_$4_$5
   rm -rfv *
+  mkdir diags
 else
   echo 'There is no oce run directory'
   mkdir ../run_oce_$1_$2_$3_$4_$5
