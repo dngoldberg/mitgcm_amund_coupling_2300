@@ -15,7 +15,7 @@ tc=(sys.argv[6])
 if (tc=='TC'):  
 
 
- direc='../../../mitgcm_amund_coupling_2300/ice_init_tc/run_ad_' + YR + '_' + PAS + '_' + invName + '_' + sliding_law
+ direc='../../ice_init_tc/run_ad_' + YR + '_' + PAS + '_' + invName + '_' + sliding_law
  print(direc)
 
  bglen_control=rdmds(direc + '/gradcontrol/xx_bglen',invIter)
@@ -31,7 +31,7 @@ if (tc=='TC'):
 
 else:
 
- direc='../../../mitgcm_amund_coupling_2300/ice_init/run_ad_' + YR + '_' + sliding_law
+ direc='../../ice_init/run_ad_' + YR + '_' + sliding_law
  print(direc)
 
  bglen_control=rdmds(direc + '/runoptiter' + str(invIter) + '/xx_bglen',invIter)
