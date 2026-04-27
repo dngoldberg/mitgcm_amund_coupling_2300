@@ -6,20 +6,6 @@ This folder contains a collection of shell and SLURM scripts used to build, prep
 
 ## 📁 File Overview
 
-### `pad_with_zeros.sh`
-Utility function for formatting numbers.
-
-**What it does:**
-- Pads a given number with leading zeros to a specified length.
-
-**Usage:**
-```sh
-source pad_with_zeros.sh
-pad_with_zeros 7 3   # Output: 007
-```
-
----
-
 ### `prepare_run.sh`
 Prepares clean run directories for both ocean and ice simulations.
 
@@ -86,6 +72,20 @@ Post-processing and data transfer script.
 - Combines model outputs
 - Handles synchronization or transfer of results
 - Logs timing information
+
+---
+
+### `pad_with_zeros.sh`
+Utility function for formatting numbers.
+
+**What it does:**
+- Pads a given number with leading zeros to a specified length.
+
+**Usage:**
+```sh
+source pad_with_zeros.sh
+pad_with_zeros 7 3   # Output: 007
+```
 
 ---
 
