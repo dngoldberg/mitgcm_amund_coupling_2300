@@ -259,9 +259,9 @@ write_coupled_input(['shelftopo.' num2str(PAS) '.bin'],topo,'oce');
 write_coupled_input('shelficemassinit.bin',shelficemass,'oce');
 write_coupled_input(bathymodname,bathy,'oce');
 
-replace_param(ocedatafile, 'psurfinitfile', ['etainit.bin.' num2str(PAS)]);
-replace_param(ocedatafile, bathymodname, 'bathy_mod.bin');
-replace_param(shelficedatafile, 'shelficetopofile', ['shelftopo.bin.' num2str(PAS)]);
+replace_param(ocedatafile, 'psurfinitfile', ['etainit.' num2str(PAS) '.bin']);
+replace_param(ocedatafile, 'bathyfile', bathymodname);
+replace_param(shelficedatafile, 'shelficetopofile', ['shelftopo.' num2str(PAS) '.bin']);
 replace_param(shelficedatafile, 'shelficemassfile', 'shelficemassinit.bin');
 r=(etainit+topo-bathy)'; shelfmask = double(topo'<0 & r>2); 
 shelfmask(shelfmask==1)=2;

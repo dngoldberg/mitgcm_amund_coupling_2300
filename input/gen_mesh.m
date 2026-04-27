@@ -1,7 +1,14 @@
 function gen_mesh(use_2004,PAS,weert,dig_depth,gamma_depth,gammaT,cd,bc_setup)
 
+global extend_mesh
+
+if isempty(extend_mesh)
+    extend_mesh = false
+end
+
 % gen_mesh(use_2004,PAS,weert,dig_depth,gamma_depth,gammaT,cd,bc_setup)
 % gen_mesh(false,80,false,80,200,0.00014,.006,false)
+% gen_mesh(false,40,false,80,200,.00012,.006,true)
 
 ice_setup = true;
 oce_setup = true;
@@ -86,7 +93,11 @@ x_mesh = x_mesh(l:l2);
 % now do new ocean grid
 
 oce_extent_y_init = [-7.12e5 -1.35e5];
-oce_extent_x_init = [-1.7e6 -1.3e6];
+if (extend_mesh);
+    oce_extent_x_init = [-1.7e6 -1.2e6];
+else
+    oce_extent_x_init = [-1.7e6 -1.3e6];
+end
 
 % revert to old
 %oce_extent_y_init = [-7.12e5 0e5];
@@ -185,7 +196,11 @@ if (length(dir([sub_dir '/bdryDatapaholPy' num2str(PAS) '.mat']))==1);
     calc_bounds = false;
 end
 
-
+npx_oce
+npy_oce
+size(x_mesh_oce_mid)
+size(y_mesh_oce_mid)
+max(x_mesh_oce_mid)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -231,8 +246,10 @@ elseif (PAS==10)
      exptstr = 'BaseClimMean'
 elseif (PAS==80)
      exptstr = 'CESMRCP852300'
-else 
-     error('bad PAS code')
+elseif (PAS==40)
+     exptstr  = 'BaseClim2300'
+elseif (PAS==41)
+     exptstr  = 'BaseClim2300'     
 end
 
 eval(['!ln -s /home/dgoldber/network_links/geosIceOcean/dgoldber/pahol_output/naughten_jas/bdryDatapahol' 'rcp85Mean' '.mat ' sub_dir '/bdryDatapahol' num2str(30) '.mat']);

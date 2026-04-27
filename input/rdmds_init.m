@@ -36,7 +36,7 @@ y = y_mesh_mid(:,1);
 z = 0:delz:Z;
 zmid = zmod;
 
-%dzmod = [   10.0000   10.0000   10.0000   10.0000   12.0000   14.5000   17.5000   21.0000   25.0000   30.0000   35.0000  40.0000  45.0000  50 ...
+%dzmod = [   10.0000   10.0000   10.0000   10.0000   12.0000   14.5000   17.5000   21.0000   25.0000   30.0000   35.0000  .0000  45.0000  50 ...
 %   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000 ...
 %   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000 ...
 %   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000   50.0000 50 50 50 50 50];
@@ -194,8 +194,7 @@ S_init_prof((ii+1):end)=S_init_prof(1,1,ii);
 T_init  = repmat(T_init_prof,[nx+gx ny+gy 1]);
 S_init  = repmat(S_init_prof,[nx+gx ny+gy 1]);
 
-%fid_T=fopen('theta_section.init','w','b');fwrite(fid_T,permute(T_init(14:17,401:403,:),[1 2 3]),'real*8');fclose(fid_T);
-%fid_T=fopen('salt_section.init','w','b');fwrite(fid_T,permute(S_init(14:17,401:403,:),[1 2 3]),'real*8');fclose(fid_T);
+
 
 write_coupled_input(['theta.init.' num2str(ystart_in) '.' num2str(PAS)],permute(T_init,[1 2 3]),'oce');
 write_coupled_input(['salt.init.' num2str(ystart_in) '.' num2str(PAS)],permute(S_init,[1 2 3]),'oce');
@@ -221,40 +220,37 @@ write_coupled_input(['salt.init.' num2str(ystart_in) '.' num2str(PAS)],permute(S
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-dstart = round(time2num(ystart_in-year_array(1)));
-
-n_months = 12*(length(year_array) - (dstart));
-
 z=double(-z);
 z2=double(-z2);
-
 V_south = Vbotbdry; 
 U_south = Ubotbdry; 
-
 V_southPAS = permute(V_south,[2 1 3]);
 U_southPAS = permute(U_south,[2 1 3]);
-
-
-% need USouth and VSoutn
-% append 10-year cycle to end of series
-PASyears = size(U_south,3)/12;
-U_south = zeros(nx_forcing,length(z),n_months);
-V_south = zeros(nx_forcing,length(z),n_months);
-U_south(:,:,1:(12*PASyears-12)) = U_southPAS(:,:,1:(end-12));
-V_south(:,:,1:(12*PASyears-12)) = V_southPAS(:,:,1:(end-12));
-U_south(:,:,(12*PASyears-11):end) = repmat(U_southPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
-V_south(:,:,(12*PASyears-11):end) = repmat(V_southPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
-
-
-% now, to create S_south and T_south!
-S_south = zeros(nx_forcing,length(z),n_months);
-T_south = zeros(nx_forcing,length(z),n_months);
-
 SbotClim = permute(SbotClim,[2 1 3]);
 TbotClim = permute(TbotClim,[2 1 3]);
 
-for i = 1:(length(year_array) - (ystart_in-year_array(1)));
+if (PAS~=40 & PAS~=41);
+
+ dstart = round(time2num(ystart_in-year_array(1)));
+ n_months = 12*(length(year_array) - (dstart));
+
+ % need USouth and VSoutn
+ % append 10-year cycle to end of series
+ PASyears = size(U_south,3)/12;
+ U_south = zeros(nx_forcing,length(z),n_months);
+ V_south = zeros(nx_forcing,length(z),n_months);
+ U_south(:,:,1:(12*PASyears-12)) = U_southPAS(:,:,1:(end-12));
+ V_south(:,:,1:(12*PASyears-12)) = V_southPAS(:,:,1:(end-12));
+ U_south(:,:,(12*PASyears-11):end) = repmat(U_southPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
+ V_south(:,:,(12*PASyears-11):end) = repmat(V_southPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
+
+
+ % now, to create S_south and T_south!
+ S_south = zeros(nx_forcing,length(z),n_months);
+ T_south = zeros(nx_forcing,length(z),n_months);
+
+
+ for i = 1:(length(year_array) - (ystart_in-year_array(1)));
 
     TbotAnomslice_i = TbotAnomslice(:,:,i+dstart);
     TbotAnomslice_im1 = TbotAnomslice(:,:,i+dstart-1);
@@ -289,7 +285,21 @@ for i = 1:(length(year_array) - (ystart_in-year_array(1)));
             TbotClim(:,:,j) + TbotAnom;
 
     end
+ end
+else
+ n_months=12;
+ S_south = SbotClim;
+ T_south = TbotClim;
+ U_south = zeros(nx_forcing,length(z),n_months);
+ V_south = zeros(nx_forcing,length(z),n_months);
+ for i=1:12;
+	 U_south(:,:,i) = mean(U_southPAS(:,:,i:(i+12):(i+108)),3);
+	 V_south(:,:,i) = mean(V_southPAS(:,:,i:(i+12):(i+108)),3);
+ end
 end
+
+size(U_south)
+
 
 %S_south(120:end,:,:)=nan;
 %T_south(120:end,:,:)=nan;
@@ -333,13 +343,13 @@ for t=1:n_months
     t
     
     if(mod(t,12)==0);
-      if (PAS>10)
+      if (PAS>10 & PAS~=40 & PAS~=41)
         cyear = ystart_in + floor((t-1)/12)
         write_coupled_input(['vvel.obs.' num2str(PAS) '_' num2str(cyear)],V_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['uvel.obs.' num2str(PAS) '_' num2str(cyear)],U_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['salt.obs.' num2str(PAS) '_' num2str(cyear)],S_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['temp.obs.' num2str(PAS) '_' num2str(cyear)],T_Int(:,:,(t-11:t)),'oce');
-      elseif (PAS==10)
+      elseif (PAS==10 | PAS==40 | PAS==41)
         write_coupled_input(['vvel.obs.' num2str(PAS)],V_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['uvel.obs.' num2str(PAS)],U_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['salt.obs.' num2str(PAS)],S_Int(:,:,(t-11:t)),'oce');
@@ -388,26 +398,27 @@ V_west = Vleftbdry;
 
 V_westPAS = permute(V_west,[2 1 3]);
 U_westPAS = permute(U_west,[2 1 3]);
-
-
-% need U and V
-% append 10-year cycle to end of series
-PASyears = size(U_west,3)/12;
-U_west = zeros(ny_forcing,length(z),n_months);
-V_west = zeros(ny_forcing,length(z),n_months);
-U_west(:,:,1:(12*PASyears-12)) = U_westPAS(:,:,1:(end-12));
-V_west(:,:,1:(12*PASyears-12)) = V_westPAS(:,:,1:(end-12));
-U_west(:,:,(12*PASyears-11):end) = repmat(U_westPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
-V_west(:,:,(12*PASyears-11):end) = repmat(V_westPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
-
-% now, to create S_south and T_south!
-S_west = zeros(ny_forcing,length(z),n_months);
-T_west = zeros(ny_forcing,length(z),n_months);
-
 SleftClim = permute(SleftClim,[2 1 3]);
 TleftClim = permute(TleftClim,[2 1 3]);
 
-for i = 1:(length(year_array) - (ystart_in-year_array(1)));
+
+
+if (PAS~=40 & PAS ~=41);
+% need U and V
+% append 10-year cycle to end of series
+ PASyears = size(U_west,3)/12;
+ U_west = zeros(ny_forcing,length(z),n_months);
+ V_west = zeros(ny_forcing,length(z),n_months);
+ U_west(:,:,1:(12*PASyears-12)) = U_westPAS(:,:,1:(end-12));
+ V_west(:,:,1:(12*PASyears-12)) = V_westPAS(:,:,1:(end-12));
+ U_west(:,:,(12*PASyears-11):end) = repmat(U_westPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
+ V_west(:,:,(12*PASyears-11):end) = repmat(V_westPAS(:,:,(end-119):end),[1 1 (1+length(year_array)-dstart-PASyears)/10]);
+
+ % now, to create S_south and T_south!
+ S_west = zeros(ny_forcing,length(z),n_months);
+ T_west = zeros(ny_forcing,length(z),n_months);
+
+ for i = 1:(length(year_array) - (ystart_in-year_array(1)));
 
     TleftAnomslice_i = TleftAnomslice(:,:,i+dstart);
     TleftAnomslice_im1 = TleftAnomslice(:,:,i+dstart-1);
@@ -442,6 +453,17 @@ for i = 1:(length(year_array) - (ystart_in-year_array(1)));
             TleftClim(:,:,j) + TleftAnom;
 
     end
+ end
+else
+ n_months=12;
+ S_west = SleftClim;
+ T_west = TleftClim;
+ U_west = zeros(ny_forcing,length(z),n_months);
+ V_west = zeros(ny_forcing,length(z),n_months);
+ for i=1:12;
+         U_west(:,:,i) = mean(U_westPAS(:,:,i:(i+12):(i+108)),3);
+         V_west(:,:,i) = mean(V_westPAS(:,:,i:(i+12):(i+108)),3);
+ end
 end
 
 %%%%%%
@@ -475,13 +497,13 @@ for t=1:n_months
     t
 
     if(mod(t,12)==0);
-      if (PAS>10)
+      if (PAS>10 & PAS~=40 & PAS~=41)
         cyear = ystart_in + floor((t-1)/12)
         write_coupled_input(['vvel.obw.' num2str(PAS) '_' num2str(cyear)],V_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['uvel.obw.' num2str(PAS) '_' num2str(cyear)],U_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['salt.obw.' num2str(PAS) '_' num2str(cyear)],S_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['temp.obw.' num2str(PAS) '_' num2str(cyear)],T_Int(:,:,(t-11:t)),'oce');
-      elseif (PAS==10)
+      elseif (PAS==10 | PAS==40 | PAS==41)
         write_coupled_input(['vvel.obw.' num2str(PAS)],V_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['uvel.obw.' num2str(PAS)],U_Int(:,:,(t-11:t)),'oce');
         write_coupled_input(['salt.obw.' num2str(PAS)],S_Int(:,:,(t-11:t)),'oce');

@@ -528,11 +528,12 @@ end
 
 bed = bed(internal_grid_y,internal_grid_x);
 if (dig_depth>0);
-	write_coupled_input(['bathy_init_oce_dig_' num2str(dig_depth) '.bin'],bed','oce');
+    fname_streamicetopog=['bathy_init_oce_dig_' num2str(dig_depth) '.bin']
 else
-	write_coupled_input('bathy_init_oce.bin',bed','oce');
+    fname_streamicetopog = 'bathy_init_oce.bin';
 end
-replace_param(streamiceocedatafile, 'streamicetopogfile','bathy_init_oce.bin');
+write_coupled_input(fname_streamicetopog,bed','oce');
+replace_param(streamiceocedatafile, 'streamicetopogfile',fname_streamicetopog);
 
 base = base(internal_grid_y,internal_grid_x);
 write_coupled_input('icetopo_init_oce.bin',base','oce');
