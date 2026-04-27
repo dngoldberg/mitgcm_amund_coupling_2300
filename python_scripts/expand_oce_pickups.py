@@ -39,9 +39,25 @@ def main(cfg_path):
     chkpt_count = 0
 
     os.makedirs(newpickup_location, exist_ok=True)
-    copyfile(exptfolder + '/pickups/pickup.' + str(oce_pickup).zfill(10) + '.meta',newpickup_location + '/pickup.ckptA.meta')
-    copyfile(exptfolder + '/pickups/pickup_streamice.' + str(oce_pickup).zfill(10) + '.meta',newpickup_location + '/pickup_streamice.ckptA.meta')
-    copyfile(exptfolder + '/pickups/pickup_shelfice.' + str(oce_pickup).zfill(10) + '.meta',newpickup_location + '/pickup_shelfice.ckptA.meta')
+    os.makedirs(newpickup_location + '/oce', exist_ok=True)
+    os.makedirs(newpickup_location + '/ice', exist_ok=True)
+    copyfile(exptfolder + '/pickups/pickup.' + str(oce_pickup).zfill(10) + '.meta',newpickup_location + '/oce' + '/pickup.ckptA.meta')
+    copyfile(exptfolder + '/pickups/pickup_streamice.' + str(oce_pickup).zfill(10) + '.meta',newpickup_location + '/oce' + '/pickup_streamice.ckptA.meta')
+    copyfile(exptfolder + '/pickups/pickup_shelfice.' + str(oce_pickup).zfill(10) + '.meta',newpickup_location + '/oce' + '/pickup_shelfice.ckptA.meta')
+
+    ice_exptfolder = exptfolder
+    ice_exptfolder = ice_exptfolder.replace('run_oce','run_ice')
+    ice_pickup = int((oce_pickup-1555200)/8640)
+
+    copyfile(ice_exptfolder + '/pickups/pickup.' + str(ice_pickup).zfill(10) + '.meta',newpickup_location + '/ice' + '/pickup.ckptA.meta')
+    copyfile(ice_exptfolder + '/pickups/pickup.' + str(ice_pickup).zfill(10) + '.data',newpickup_location + '/ice' + '/pickup.ckptA.data')
+
+    copyfile(ice_exptfolder + '/pickups/pickup_streamice.' + str(ice_pickup).zfill(10) + '.meta',newpickup_location + '/ice' + '/pickup_streamice.ckptA.meta')
+    copyfile(ice_exptfolder + '/pickups/pickup_streamice.' + str(ice_pickup).zfill(10) + '.data',newpickup_location + '/ice' + '/pickup_streamice.ckptA.data')
+
+    copyfile(ice_exptfolder + '/pickups/pickup_streamice.' + str(ice_pickup).zfill(10) + '.meta',newpickup_location + '/ice' + '/pickup_streamice.ckptAlast.meta')
+    copyfile(ice_exptfolder + '/pickups/pickup_streamice.' + str(ice_pickup).zfill(10) + '.data',newpickup_location + '/ice' + '/pickup_streamice.ckptAlast.data')
+
 
     meta_main = parsemeta(exptfolder + '/pickups/pickup.' + str(oce_pickup).zfill(10) + '.meta')
     meta_shelfice = parsemeta(exptfolder + '/pickups/pickup_shelfice.' + str(oce_pickup).zfill(10) + '.meta')
@@ -67,8 +83,6 @@ def main(cfg_path):
     meta_shelfice['dimList'] = dims
     meta_streamice['dimList'] = dims
 
-    ice_exptfolder = exptfolder
-    ice_exptfolder = ice_exptfolder.replace('run_oce','run_ice')
 
     pickupfile = exptfolder + '/pickups/pickup'
     shelficepickupfile = exptfolder + '/pickups/pickup_shelfice'
@@ -132,7 +146,7 @@ def main(cfg_path):
             
             DataNew[i_e,:,:] = fldNew
 
-    DataNew.byteswap().tofile(newpickup_location + '/pickup.ckptA.data')
+    DataNew.byteswap().tofile(newpickup_location+ '/oce'  + '/pickup.ckptA.data')
 
     ###
 
@@ -147,7 +161,7 @@ def main(cfg_path):
 
     for i in range(len(fldList)):
         fldName = fldList[i]
-        if (i >= 0) & (i < 5):
+        if i in [0, 2, 3, 4]:
 
             fldNew = np.zeros((ny,nxnew))
             fldLSI = qLSI[nzLSI+i,:,:]
@@ -155,7 +169,12 @@ def main(cfg_path):
             fldNew[:,:(nxold-1)] = qSI[i+nz,:,:(nxold-1)]
             DataNewSI[nz+i,:,:] = fldNew
 
-    DataNewSI.byteswap().tofile(newpickup_location + '/pickup_streamice.ckptA.data')
+        if i==1:
+
+            fldNew = np.fromfile(input_folder + '/hmask_oce.bin').byteswap().reshape(ny,nxnew)
+            DataNewSI[nz+i,:,:] = fldNew
+
+    DataNewSI.byteswap().tofile(newpickup_location + '/oce' + '/pickup_streamice.ckptA.data')
 
     ###
 
@@ -172,18 +191,18 @@ def main(cfg_path):
     fldNew[:,:(nxold-1)] = qShI[1,:,:(nxold-1)]
     DataNewShI[1,:,:] = fldNew
 
-    DataNewShI.byteswap().tofile(newpickup_location + '/pickup_shelfice.ckptA.data')
+    DataNewShI.byteswap().tofile(newpickup_location + '/oce' + '/pickup_shelfice.ckptA.data')
 
     ###
 
     for nm in ['pickup_shelfice.ckptA.meta', 'pickup.ckptA.meta', 'pickup_streamice.ckptA.meta']:
 
-     with open(newpickup_location+'/'+nm,'r') as file:
+     with open(newpickup_location+ '/oce' +'/'+nm,'r') as file:
       filedata = file.read()
      
      filedata = filedata.replace(str(nxold),str(nxnew))
      
-     with open(newpickup_location+'/'+nm, 'w') as file:
+     with open(newpickup_location+ '/oce' +'/'+nm, 'w') as file:
       file.write(filedata)
 
 if __name__ == '__main__':
